@@ -16,3 +16,7 @@ along with this program; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 All files in this folder and subfolders, unless explicitly stated otherwise or copyrighted by other authors, are copyrighted by mirage335 as described above.
+
+Cryptographic keys, unique identifiers, and associated works of cryptographic keys and/or unique identifiers, under "_local" files and/or directories are exluded from GPLv3 copyright. These are not compiled or concatenated into a single file including other source code, and would not be considered derived works of flipKey.
+
+

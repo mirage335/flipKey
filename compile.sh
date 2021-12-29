@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='2627764544'
+export ub_setScriptChecksum_contents='1149151848'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -6066,22 +6066,30 @@ CZXWXcRMTo8EmM8i4d
 
 
 
+
+_generate_lean-python_prog() {
+	return 0
+}
+
 _generate_compile_bash_prog() {
 	"$scriptAbsoluteLocation" _true
 	
-	return
+	#return
 	
-	rm "$scriptAbsoluteFolder"/ubiquitous_bash.sh
+	#rm "$scriptAbsoluteFolder"/ubiquitous_bash.sh
 	
 	#"$scriptAbsoluteLocation" _compile_bash cautossh cautossh
 	#"$scriptAbsoluteLocation" _compile_bash lean lean.sh
 	
-	"$scriptAbsoluteLocation" _compile_bash core ubiquitous_bash.sh
+	"$scriptAbsoluteLocation" _compile_bash flipKey ubiquitous_bash.sh
 	
 	#"$scriptAbsoluteLocation" _compile_bash "" ""
 	#"$scriptAbsoluteLocation" _compile_bash ubiquitous_bash ubiquitous_bash.sh
 	
 	#"$scriptAbsoluteLocation" _package
+	
+	"$scriptAbsoluteLocation" _compile_bash flipKey flipKey
+	chmod 700 "$scriptAbsoluteFolder"/flipKey
 }
 
 #Default is to include all, or run a specified configuration. For this reason, it will be more typical to override this entire function, rather than append any additional code.
@@ -7156,7 +7164,29 @@ _compile_bash() {
 }
 
 _compile_bash_deps_prog() {
-	true
+	if [[ "$1" == "flipKey" ]]
+	then
+		_deps_channel
+		
+		#_deps_metaengine
+		
+		
+		#_deps_mount
+		#_deps_notLean
+		#_deps_image
+		
+		#_deps_git
+		#_deps_bup
+		
+		# Include the extremely common applications (ie. 'dd) for disk repo shortcuts.
+		_deps_repo
+		
+		_deps_calculators
+		
+		_deps_disc
+		
+		return 0
+	fi
 }
 
 #Default is to include all, or run a specified configuration. For this reason, it will be more typical to override this entire function, rather than append any additional code.
@@ -7179,7 +7209,9 @@ _vars_compile_bash_prog() {
 
 _compile_bash_header_prog() {	
 	export includeScriptList
-	true
+	
+	# Cygwin/MSW native binary override .
+	includeScriptList+=( "flipKey/wrapper/veraCrypt/"veraCrypt_override.sh )
 }
 
 _compile_bash_header_program_prog() {	
@@ -7264,7 +7296,28 @@ _compile_bash_installation_prog() {
 
 _compile_bash_program_prog() {	
 	export includeScriptList
-	true
+	
+	
+	includeScriptList+=( "flipKey/"flipKey_disk.sh )
+	
+	includeScriptList+=( "flipKey/wrapper/veraCrypt/"veraCrypt.sh )
+	
+	
+	includeScriptList+=( "flipKey/specialized/extremelyRedundant/"fsTemp.sh )
+	includeScriptList+=( "flipKey/specialized/extremelyRedundant/"extremelyRedundant.sh )
+	
+	
+	includeScriptList+=( "flipKey/"token.sh )
+	
+	includeScriptList+=( "flipKey/"patterns.sh )
+	
+	includeScriptList+=( "flipKey/"generate.sh )
+	includeScriptList+=( "flipKey/"sweep.sh )
+	
+	
+	
+	includeScriptList+=( "filesystem/"nilfs_garbageCollect.sh )
+	includeScriptList+=( "filesystem/"btrfs.sh )
 }
 
 _compile_bash_config_prog() {	

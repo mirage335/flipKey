@@ -1,4 +1,19 @@
 
+discManager
+discManager.sh
+temp.sh
+image.ima.xz
+
+package_full.tar.*
+package_kit.tar.*
+
+
+_lib/_setups/
+
+disk.sh
+
+*.fll
+
 _index
 _local/*
 
