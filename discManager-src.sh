@@ -2011,7 +2011,7 @@ _keyPartition_disk_generic() {
 	sync
 	sleep 15
 	
-	export expectedSECTOR=$(sudo -n sgdisk "$currentDrive" --print | grep -i 'Sector size' | grep -i 'logical' | tr -dc '0-9/' | sed 's/^\///' | cut -f2 -d\/)
+	export expectedSECTOR=$(sudo -n sgdisk "$currentDrive" --print | grep -i 'Sector size' | grep -i 'logical' | tr -dc '0-9/' | sed 's/^\///' | cut -f1 -d\/)
 	if [[ "$expectedSECTOR" != 2048 ]] && [[ "$expectedSECTOR" != 512 ]] && [[ "$expectedSECTOR" != 1024 ]] && [[ "$expectedSECTOR" != 4096 ]]
 	then
 		echo 'fail: unrecognized sector size: '"$expectedSECTOR" && exit 1
@@ -2642,7 +2642,7 @@ _extremelyRedundant_disc() {
 	sync
 	sleep 15
 	
-	export expectedSECTOR=$(sudo -n sgdisk "$currentDrive" --print | grep -i 'Sector size' | grep -i 'logical' | tr -dc '0-9/' | sed 's/^\///' | cut -f2 -d\/)
+	export expectedSECTOR=$(sudo -n sgdisk "$currentDrive" --print | grep -i 'Sector size' | grep -i 'logical' | tr -dc '0-9/' | sed 's/^\///' | cut -f1 -d\/)
 	if [[ "$expectedSECTOR" != 2048 ]] && [[ "$expectedSECTOR" != 512 ]] && [[ "$expectedSECTOR" != 1024 ]] && [[ "$expectedSECTOR" != 4096 ]]
 	then
 		echo 'fail: unrecognized sector size: '"$expectedSECTOR" && exit 1
@@ -5187,8 +5187,34 @@ _splitDisc_generate() {
 
 
 
-
-
+#_vector_splitDisc_position
+# 
+#         1935360                 2426879                 240M    491392
+#         2426880                 2918399                 240M    491392
+#         2918400                 3409919                 240M    491392
+#         3409920                 4741119                 650M    1331072
+#         4741120                 6072319                 650M    1331072
+#         6072320                 7403519                 650M    1331072
+#         7403520                 8734719                 650M    1331072
+#         8734720                 10065919                650M    1331072
+#         10065920                11397119                650M    1331072
+#         11397120                12728319                650M    1331072
+#         12728320                14059519                650M    1331072
+#         14059520                15390719                650M    1331072
+#         15390720                16721919                650M    1331072
+#         16721920                18053119                650M    1331072
+#         18053120                19384319                650M    1331072
+#         19384320                20715519                650M    1331072
+#         20715520                22046719                650M    1331072
+#         22046720                23377919                650M    1331072
+#         23377920                28293119                2400M   4915072
+#         28293120                33208319                2400M   4915072
+#         33208320                38123519                2400M   4915072
+#         38123520                43038719                2400M   4915072
+# 
+# 
+#         38123520                43038719                2400M   4915072
+# 
 _vector_splitDisc_newPartition() {
 	_set_splitDisc_default
 	
