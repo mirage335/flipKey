@@ -1982,9 +1982,23 @@ _keyPartition_disk_generic() {
 	[[ "$currentDrive_size" == "" ]] && return 1
 	
 	
+	local keyPartition_desiredMebibytes
+	keyPartition_desiredMebibytes=8
+	if bc <<< "$currentDrive_size > 192000000000"
+	then
+		keyPartition_desiredMebibytes=300
+	fi
+	if bc <<< "$currentDrive_size > 768000000000"
+	then
+		keyPartition_desiredMebibytes=750
+	fi
+	
+	local keyPartition_desiredMebibytes_key
+	let keyPartition_desiredMebibytes_key=keyPartition_desiredMebibytes-1
+	
 	
 	local desiredMebibytes
-	desiredMebibytes=$(bc <<< " ( $currentDrive_size / 1048576 ) - 28 - ( 8 * 2 ) - 16")
+	desiredMebibytes=$(bc <<< " ( $currentDrive_size / 1048576 ) - 28 - ( $keyPartition_desiredMebibytes * 2 ) - 16")
 	
 	
 	_extremelyRedundant_desilver_partitions "$currentDrive"
@@ -2018,7 +2032,7 @@ _keyPartition_disk_generic() {
 		#export expectedSECTOR="2048"
 	fi
 	
-	_extremelyRedundant_newKeyPartition() { _extremelyRedundant_newPartition 7 MiB 8 ; }
+	_extremelyRedundant_newKeyPartition() { _extremelyRedundant_newPartition $keyPartition_desiredMebibytes_key MiB $keyPartition_desiredMebibytes ; }
 	
 	
 	_extremelyRedundant_sectorPosition_reset
