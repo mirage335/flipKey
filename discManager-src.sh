@@ -5508,22 +5508,22 @@ _messagePlain_request() {
 }
 _README() {
 	local currentAttachmentLine
-	currentAttachmentLine=`awk '/^#__README_uk4uPhB663kVcygT0q_README__/ {print NR + 1; exit 0; }' $0`
+	currentAttachmentLine=`awk '/^#__README_uk4uPhB663kVcygT0q_README__/ {print NR + 1; exit 0; }' "$0"`
 	let currentAttachmentLine="$currentAttachmentLine - 1"
-	head -n$currentAttachmentLine $0
+	head -n$currentAttachmentLine "$0"
 }
 [[ "$1" == "" ]] && _README && exit 0
 # https://www.linuxjournal.com/node/1005818
 _attachment() {
 	local currentAttachmentLine
-	currentAttachmentLine=`awk '/^__ATTACHMENT_uk4uPhB663kVcygT0q_ATTACHMENT__/ {print NR + 1; exit 0; }' $0`
-	tail -n+$currentAttachmentLine $0 | base64 -d
+	currentAttachmentLine=`awk '/^__ATTACHMENT_uk4uPhB663kVcygT0q_ATTACHMENT__/ {print NR + 1; exit 0; }' "$0"`
+	tail -n+$currentAttachmentLine "$0" | base64 -d
 }
 _noAttachment() {
 	local currentAttachmentLine
-	currentAttachmentLine=`awk '/^__ATTACHMENT_uk4uPhB663kVcygT0q_ATTACHMENT__/ {print NR + 1; exit 0; }' $0`
+	currentAttachmentLine=`awk '/^__ATTACHMENT_uk4uPhB663kVcygT0q_ATTACHMENT__/ {print NR + 1; exit 0; }' "$0"`
 	let currentAttachmentLine="$currentAttachmentLine - 1"
-	head -n$currentAttachmentLine $0
+	head -n$currentAttachmentLine "$0"
 }
 _rmAttachment() {
 	# WARNING: Unattached package file may be deleted by script through user called functions.
