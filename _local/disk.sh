@@ -41,6 +41,9 @@ _disk_declare() {
 	#export flipKey_removable='true'
 	#export flipKey_physical='false'
 	
+	# Conversely, if NOT removable (ie. if a permanently installed HDD/SSD), it may be better to explicitly disable overwriting most of the device, to avoid unnecessarily wasted time and flash exhaustion, assuming sufficient data will be written during usual usage to cause overwriting.
+	#export flipKey_removable='false'
+	
 	# Example. Unusual. Uses much of the available space.
 	#export flipKey_containerSize=$(bc <<< "scale=0; ( ( "$(df --block-size=1 --output=avail "$scriptLocal" | tr -dc '0-9')" / 1.01 ) * 1 ) - 128000000 - $flipKey_headerKeySize")
 }
