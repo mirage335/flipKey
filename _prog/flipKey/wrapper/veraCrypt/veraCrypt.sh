@@ -148,7 +148,7 @@ _veracrypt_create_procedure() {
 		if [[ "$flipKey_filesystem" == "ext4" ]] || [[ "$flipKey_filesystem" == "btrfs" ]]
 		then
 			mkdir -p "$flipKey_mount"
-			sudo -n mkdir "$flipKey_mount"
+			sudo -n mkdir -p "$flipKey_mount"
 			
 			
 			local currentIterations

@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='59984769'
+export ub_setScriptChecksum_contents='2699094298'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -13987,7 +13987,7 @@ _veracrypt_create_procedure() {
 		if [[ "$flipKey_filesystem" == "ext4" ]] || [[ "$flipKey_filesystem" == "btrfs" ]]
 		then
 			mkdir -p "$flipKey_mount"
-			sudo -n mkdir "$flipKey_mount"
+			sudo -n mkdir -p "$flipKey_mount"
 			
 			
 			local currentIterations
@@ -15124,6 +15124,7 @@ _touch-flipKey-touch-loop() {
 }
 _touch-flipKey() {
 	mkdir -p "$flipKey_mount"
+	sudo -n mkdir -p "$flipKey_mount"
 	
 	if [[ "$flipKey_packetDisc_exhaustible" == "true" ]]
 	then
@@ -15305,6 +15306,11 @@ _sweep-flipKey() {
 
 _clean-flipKey() {
 	_messagePlain_nominal 'init: _clean-flipKey'
+	
+	local currentFillPath
+	currentFillPath="$scriptLocal"/fill
+	[[ "$flipKey_fillPath" != "" ]] && currentFillPath="$flipKey_fillPath"
+	[[ "$1" != "" ]] && currentFillPath="$1"
 	
 	[[ "$flipKey_tokenID" != "" ]] && [[ "$flipKey_token_keyID" != "" ]] && currentFillPath="$scriptLocal"/token/fill
 	
@@ -15575,6 +15581,7 @@ _sweep() {
 _clean() {
 	local currentFillPath
 	currentFillPath="$scriptLocal"/fill
+	[[ "$flipKey_fillPath" != "" ]] && currentFillPath="$flipKey_fillPath"
 	[[ "$1" != "" ]] && currentFillPath="$1"
 	
 	cat /dev/zero | pv > "$currentFillPath"

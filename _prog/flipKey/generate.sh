@@ -166,6 +166,7 @@ _touch-flipKey-touch-loop() {
 }
 _touch-flipKey() {
 	mkdir -p "$flipKey_mount"
+	sudo -n mkdir -p "$flipKey_mount"
 	
 	if [[ "$flipKey_packetDisc_exhaustible" == "true" ]]
 	then
@@ -347,6 +348,11 @@ _sweep-flipKey() {
 
 _clean-flipKey() {
 	_messagePlain_nominal 'init: _clean-flipKey'
+	
+	local currentFillPath
+	currentFillPath="$scriptLocal"/fill
+	[[ "$flipKey_fillPath" != "" ]] && currentFillPath="$flipKey_fillPath"
+	[[ "$1" != "" ]] && currentFillPath="$1"
 	
 	[[ "$flipKey_tokenID" != "" ]] && [[ "$flipKey_token_keyID" != "" ]] && currentFillPath="$scriptLocal"/token/fill
 	

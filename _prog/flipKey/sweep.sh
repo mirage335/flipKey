@@ -48,6 +48,7 @@ _sweep() {
 _clean() {
 	local currentFillPath
 	currentFillPath="$scriptLocal"/fill
+	[[ "$flipKey_fillPath" != "" ]] && currentFillPath="$flipKey_fillPath"
 	[[ "$1" != "" ]] && currentFillPath="$1"
 	
 	cat /dev/zero | pv > "$currentFillPath"
