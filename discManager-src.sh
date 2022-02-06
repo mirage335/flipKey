@@ -85,7 +85,7 @@
 # _bd25_bank
 # 
 # 
-#	Permanently write a read-only copy of existing file-based (NOT partitioned) flipKey volume to a 'packetDisc' .
+#	Permanently write a read-only copy of existing file-based or mo keyPartition (NOT other partitioned) flipKey volume to a 'packetDisc' .
 # _packetDisc_permanent
 # 
 # ```
