@@ -1,5 +1,4 @@
 [submodule "_lib/ubiquitous_bash"]
 	path = _lib/ubiquitous_bash
 	url = git@github.com:mirage335/ubiquitous_bash.git
-[submodules "_lib/ubiquitous_bash"]
 	shallow = true
