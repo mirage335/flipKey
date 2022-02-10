@@ -86,6 +86,7 @@
 # 
 # 
 #	Permanently write a read-only copy of existing file-based or mo keyPartition (NOT other partitioned) flipKey volume to a 'packetDisc' .
+#	May fail if temporary directories used are not writable (eg. if MO disc is used read-only).
 # _packetDisc_permanent
 # 
 # ```
