@@ -4473,6 +4473,13 @@ _desilver_mo() {
 	[[ "$currentDrive_currentDisc_gigamo" == 'true' ]] && echo "detected: 'gigamo' disc"
 	
 	_desilver_mo_keyPartition "$currentDrive" > /dev/null
+	
+	# ATTENTION: MO drives are thoroughly optimized to read data as reliably as possible by default, very abundantly cautious about writing, will not overwrite adjacent disc sectors, and will abort further writing if written data cannot be verified to have excellent ECC recovery margins. Thus, rare MO drives 30% faster than other MO drives, will successfully read all data, but with discs formatted by slower drives, may fail to write due to sectors marked acceptable by the previous formatting. Solution is to format with faster drives when possible, to mark fast-intolerant sectors as unavailable for writing.
+	# Very, very rarely, an MO drive will be ~30% faster than other MO drives, and a few discs will have sectors not sufficiently write tolerant of these speeds to pass verification, causing an apparent 'Input/output error'. Low-level formatting such a disc with the faster drive, but not low-level formatting with a slower drive, apparently maps sparing areas as necessary for the faster write speed.
+	# Reformatting with a slower drive will map the fast intolerant sectors active again, causing write fail with the fast drive, again.
+	echo "WARNING: If overwriting fails (with a fast drive), 'sg_format' may be necessary *before* usual desilver ."
+	echo "WARNING: Formatting with a slow drive may result in a disc not completely writable by a fast drive."
+	
 	sudo -n dd if=/dev/urandom of="$currentDrive" bs=2M oflag=direct conv=fdatasync status=progress
 	
 	sudo -n dd if=/dev/urandom of="$currentDrive" bs=2M oflag=direct conv=fdatasync status=progress
