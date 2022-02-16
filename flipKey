@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='4093818261'
+export ub_setScriptChecksum_contents='835868568'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14620,10 +14620,15 @@ _set_occasional_read_redundant_headerKey() {
 
 
 _extremelyRedundant_cryptsetup() {
-	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult02_uuid" "$flipKey_container_mult02_devFile"
-	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult04_uuid" "$flipKey_container_mult04_devFile"
-	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult06_uuid" "$flipKey_container_mult06_devFile"
-	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult08_uuid" "$flipKey_container_mult08_devFile"
+	[[ $(sudo -n cat "$flipKey_headerKeyFile" | head --bytes=48 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | wc -c | tr -dc '0-9') -lt "393015" ]] && _messagePlain_bad 'fail: size: key' && return 1
+	[[ $(sudo -n cat "$flipKey_headerKeyFile" | head --bytes=100 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | wc -c | tr -dc '0-9') -lt "393015" ]] && _messagePlain_bad 'fail: size: key' && return 1
+	[[ $(sudo -n cat "$flipKey_headerKeyFile" | head --bytes=150 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | wc -c | tr -dc '0-9') -lt "393015" ]] && _messagePlain_bad 'fail: size: key' && return 1
+	[[ $(sudo -n cat "$flipKey_headerKeyFile" | head --bytes=200 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | wc -c | tr -dc '0-9') -lt "393015" ]] && _messagePlain_bad 'fail: size: key' && return 1
+	
+	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=48 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult02_uuid" "$flipKey_container_mult02_devFile"
+	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=100 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult04_uuid" "$flipKey_container_mult04_devFile"
+	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=150 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult06_uuid" "$flipKey_container_mult06_devFile"
+	sudo -n cat "$flipKey_headerKeyFile" | head --bytes=200 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | sudo -n /sbin/cryptsetup --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create flipKey_"$flipKey_container_mult08_uuid" "$flipKey_container_mult08_devFile"
 }
 
 _extremelyRedundant_cryptsetup_remove() {
