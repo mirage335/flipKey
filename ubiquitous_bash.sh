@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='835868568'
+export ub_setScriptChecksum_contents='2422982188'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -13388,7 +13388,7 @@ _check_keyPartition() {
 		return 1
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		if ! [[ -e "$flipKey_headerKeyFile" ]]
 		then
@@ -13900,7 +13900,10 @@ _veracrypt_create_procedure() {
 		export flipKey_filesystem="ext4"
 	fi
 	
-	[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: create: size' && return 1
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	then
+		[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: create: size' && return 1
+	fi
 	
 	_veracrypt_binOverride
 	
@@ -13968,7 +13971,7 @@ _veracrypt_create_procedure() {
 		# https://security.stackexchange.com/questions/200950/how-and-what-information-does-trim-reveal-when-using-encrypted-veracrypt-volumes
 		# 'veracrypt does this in it's own way, linux has it's own way to do this intercept operation'
 		
-		if [[ "$flipKey_container" != "/dev"* ]]
+		if [[ "$flipKey_container" != "/dev"* ]] || [[ "$flipKey_container" == "/dev/shm/"* ]]
 		then
 			if [[ "$flipKey_packetDisc_writeOnce" != "true" ]]
 			then
@@ -14250,7 +14253,10 @@ _veracrypt_mount() {
 _veracrypt_mount_procedure() {
 	_messageNormal 'init: _veracrypt_mount'
 	
-	[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	then
+		[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	fi
 	
 	_veracrypt_binOverride
 	
@@ -14404,7 +14410,10 @@ _veracrypt_unmount() {
 _veracrypt_unmount_procedure() {
 	_messageNormal 'init: _veracrypt_unmount'
 	
-	#[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	#if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	#then
+		#[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	#fi
 	
 	_veracrypt_binOverride
 	
@@ -15028,14 +15037,14 @@ _generate_flipKey_header() {
 	
 	_touch-flipKey-touch-random "$flipKey_headerKeyFile"
 	
-	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
 	then
 		chmod 600 "$flipKey_headerKeyFile"
 		chown "$USER":"$USER" "$flipKey_headerKeyFile"
 		_generate_keyData "$1" | pv > "$flipKey_headerKeyFile"
 		
 		[[ -e "$flipKey_headerKeyFile" ]] && ! [[ -s "$flipKey_headerKeyFile" ]] && _messagePlain_bad 'fail: write: empty'
-		[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ -e "$flipKey_headerKeyFile" ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$currentHeaderKeySize" ]] && _messagePlain_bad 'fail: write: size'
+		( [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]] ) && [[ -e "$flipKey_headerKeyFile" ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$currentHeaderKeySize" ]] && _messagePlain_bad 'fail: write: size'
 	else
 		if ! _generate_keyData "$1" | pv > "$flipKey_headerKeyFile"
 		then
@@ -15078,7 +15087,7 @@ _generate_flipKey_header() {
 	_touch-flipKey "$flipKey_headerKeyFile"
 	
 	
-	[[ -e "$flipKey_headerKeyFile" ]] && [[ -s "$flipKey_headerKeyFile" ]] && [[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') == "$currentHeaderKeySize" ]] && _messagePlain_good 'good: write'
+	[[ -e "$flipKey_headerKeyFile" ]] && [[ -s "$flipKey_headerKeyFile" ]] && ( [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]] ) && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') == "$currentHeaderKeySize" ]] && _messagePlain_good 'good: write'
 	return
 }
 
@@ -15119,7 +15128,7 @@ _touch-flipKey-touch-random() {
 	sync
 }
 _touch-flipKey-touch-loop() {
-	if [[ "$1" == "/dev/"* ]]
+	if [[ "$1" == "/dev/"* ]] && [[ "$1" != "/dev/shm/"* ]]
 	then
 		_touch-flipKey-touch-numeric "$1" 1
 		_touch-flipKey-touch-random "$1"
@@ -15197,7 +15206,7 @@ _sweep_branch-flipKey() {
 	fi
 	
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		for currentIteration in {1..12}
 		do
@@ -15212,7 +15221,7 @@ _sweep_branch-flipKey() {
 		sync
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		sudo -n blkdiscard "$flipKey_headerKeyFile"
 		
@@ -15222,7 +15231,7 @@ _sweep_branch-flipKey() {
 		sync
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		for currentIteration in {1..20}
 		do
@@ -15239,7 +15248,7 @@ _sweep_branch-flipKey() {
 	
 	if man wipe 2> /dev/null | grep 'Berke Durak' > /dev/null && man wipe 2> /dev/null | grep '\-Q <number\-of\-passes>' > /dev/null && man wipe 2> /dev/null | grep '\-s (silent mode)' > /dev/null
 	then
-		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 		then
 			if ! wipe -l 36K -k -F -f -D "$@"
 			then
@@ -15265,7 +15274,7 @@ _sweep_branch-flipKey() {
 		
 		sync
 		
-		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 		then
 			if ! dd if=/dev/urandom of="$flipKey_headerKeyFile" bs=256K count=4 oflag=direct conv=fdatasync status=progress && ! dd if=/dev/urandom of="$flipKey_headerKeyFile" bs=256K count=4 oflag=direct conv=fdatasync status=progress
 			then
@@ -15311,7 +15320,7 @@ _sweep-flipKey() {
 	
 	if _sweep_branch-flipKey "$@"
 	then
-		[[ "$flipKey_headerKeyFile" == "/dev/"* ]] && _messagePlain_good 'good: sweep' && return 0
+		[[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]] && _messagePlain_good 'good: sweep' && return 0
 	fi
 	
 	[[ -e "$1" ]] && _messagePlain_bad 'fail: sweep (unless timeout)'

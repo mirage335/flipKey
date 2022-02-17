@@ -284,7 +284,7 @@ _check_keyPartition() {
 		return 1
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		if ! [[ -e "$flipKey_headerKeyFile" ]]
 		then

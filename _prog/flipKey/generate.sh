@@ -51,14 +51,14 @@ _generate_flipKey_header() {
 	
 	_touch-flipKey-touch-random "$flipKey_headerKeyFile"
 	
-	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
 	then
 		chmod 600 "$flipKey_headerKeyFile"
 		chown "$USER":"$USER" "$flipKey_headerKeyFile"
 		_generate_keyData "$1" | pv > "$flipKey_headerKeyFile"
 		
 		[[ -e "$flipKey_headerKeyFile" ]] && ! [[ -s "$flipKey_headerKeyFile" ]] && _messagePlain_bad 'fail: write: empty'
-		[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ -e "$flipKey_headerKeyFile" ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$currentHeaderKeySize" ]] && _messagePlain_bad 'fail: write: size'
+		( [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]] ) && [[ -e "$flipKey_headerKeyFile" ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$currentHeaderKeySize" ]] && _messagePlain_bad 'fail: write: size'
 	else
 		if ! _generate_keyData "$1" | pv > "$flipKey_headerKeyFile"
 		then
@@ -101,7 +101,7 @@ _generate_flipKey_header() {
 	_touch-flipKey "$flipKey_headerKeyFile"
 	
 	
-	[[ -e "$flipKey_headerKeyFile" ]] && [[ -s "$flipKey_headerKeyFile" ]] && [[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') == "$currentHeaderKeySize" ]] && _messagePlain_good 'good: write'
+	[[ -e "$flipKey_headerKeyFile" ]] && [[ -s "$flipKey_headerKeyFile" ]] && ( [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]] ) && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') == "$currentHeaderKeySize" ]] && _messagePlain_good 'good: write'
 	return
 }
 
@@ -142,7 +142,7 @@ _touch-flipKey-touch-random() {
 	sync
 }
 _touch-flipKey-touch-loop() {
-	if [[ "$1" == "/dev/"* ]]
+	if [[ "$1" == "/dev/"* ]] && [[ "$1" != "/dev/shm/"* ]]
 	then
 		_touch-flipKey-touch-numeric "$1" 1
 		_touch-flipKey-touch-random "$1"
@@ -220,7 +220,7 @@ _sweep_branch-flipKey() {
 	fi
 	
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		for currentIteration in {1..12}
 		do
@@ -235,7 +235,7 @@ _sweep_branch-flipKey() {
 		sync
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		sudo -n blkdiscard "$flipKey_headerKeyFile"
 		
@@ -245,7 +245,7 @@ _sweep_branch-flipKey() {
 		sync
 	fi
 	
-	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+	if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 	then
 		for currentIteration in {1..20}
 		do
@@ -262,7 +262,7 @@ _sweep_branch-flipKey() {
 	
 	if man wipe 2> /dev/null | grep 'Berke Durak' > /dev/null && man wipe 2> /dev/null | grep '\-Q <number\-of\-passes>' > /dev/null && man wipe 2> /dev/null | grep '\-s (silent mode)' > /dev/null
 	then
-		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 		then
 			if ! wipe -l 36K -k -F -f -D "$@"
 			then
@@ -288,7 +288,7 @@ _sweep_branch-flipKey() {
 		
 		sync
 		
-		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if [[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]]
 		then
 			if ! dd if=/dev/urandom of="$flipKey_headerKeyFile" bs=256K count=4 oflag=direct conv=fdatasync status=progress && ! dd if=/dev/urandom of="$flipKey_headerKeyFile" bs=256K count=4 oflag=direct conv=fdatasync status=progress
 			then
@@ -334,7 +334,7 @@ _sweep-flipKey() {
 	
 	if _sweep_branch-flipKey "$@"
 	then
-		[[ "$flipKey_headerKeyFile" == "/dev/"* ]] && _messagePlain_good 'good: sweep' && return 0
+		[[ "$flipKey_headerKeyFile" == "/dev/"* ]] && [[ "$flipKey_headerKeyFile" != "/dev/shm/"* ]] && _messagePlain_good 'good: sweep' && return 0
 	fi
 	
 	[[ -e "$1" ]] && _messagePlain_bad 'fail: sweep (unless timeout)'

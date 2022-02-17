@@ -47,7 +47,10 @@ _veracrypt_create_procedure() {
 		export flipKey_filesystem="ext4"
 	fi
 	
-	[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: create: size' && return 1
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	then
+		[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: create: size' && return 1
+	fi
 	
 	_veracrypt_binOverride
 	
@@ -115,7 +118,7 @@ _veracrypt_create_procedure() {
 		# https://security.stackexchange.com/questions/200950/how-and-what-information-does-trim-reveal-when-using-encrypted-veracrypt-volumes
 		# 'veracrypt does this in it's own way, linux has it's own way to do this intercept operation'
 		
-		if [[ "$flipKey_container" != "/dev"* ]]
+		if [[ "$flipKey_container" != "/dev"* ]] || [[ "$flipKey_container" == "/dev/shm/"* ]]
 		then
 			if [[ "$flipKey_packetDisc_writeOnce" != "true" ]]
 			then
@@ -397,7 +400,10 @@ _veracrypt_mount() {
 _veracrypt_mount_procedure() {
 	_messageNormal 'init: _veracrypt_mount'
 	
-	[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	then
+		[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	fi
 	
 	_veracrypt_binOverride
 	
@@ -551,7 +557,10 @@ _veracrypt_unmount() {
 _veracrypt_unmount_procedure() {
 	_messageNormal 'init: _veracrypt_unmount'
 	
-	#[[ "$flipKey_headerKeyFile" != "/dev/"* ]] && [[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	#if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
+	#then
+		#[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
+	#fi
 	
 	_veracrypt_binOverride
 	
