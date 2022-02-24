@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='1149151848'
+export ub_setScriptChecksum_contents='1301599018'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -5138,14 +5138,7 @@ class ubPythonPS1(object):
 sys.ps1 = ubPythonPS1()
 sys.ps2 = "\x01\033[0;96m\x02|...\x01\033[0m\x02 "
 
-
-
-
 #_python()
-
-
-
-
 
 CZXWXcRMTo8EmM8i4d
 }
@@ -5154,6 +5147,9 @@ CZXWXcRMTo8EmM8i4d
 _generate_lean-overrides-python_here() {
 	cat << 'CZXWXcRMTo8EmM8i4d'
 
+# WARNING: Strongly discouraged example.
+# (strongly prefer to inherit a single os.environ['scriptAbsoluteFolder'] environment variable from being called by an 'ubiquitous_bash' script)
+#exec(open(_getScriptAbsoluteFolder()+'/lean.py').read())
 
 
 
@@ -5162,37 +5158,21 @@ _generate_lean-overrides-python_here() {
 
 
 
+
+
+
+# ATTENTION: NOTICE: Environment variables from 'ubiquitous_bash' can be used to import other python scripts.
+#exec(open(os.environ['scriptAbsoluteFolder']+'/lean.py').read())
 
 #################################################
-# ATTENTION: Add '_prog' script code here!
-
-
-
-
-
-
+# ATTENTION: NOTICE: Add '_prog' script code here!
 
 def _main():
 	pass
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ATTENTION: Add '_prog' script code here!
+# ATTENTION: NOTICE: Add '_prog' script code here!
 #################################################
 
 
@@ -5202,9 +5182,10 @@ if sys.hexversion > 0x03000000:
 
 import sys
 import string
-#./lean.py "_python(c('1 + 2'))"
+#./lean.py "_python(c('1 + 2'))" #FAIL
+#python3 ./lean.py "_print(c('1 + 2'))"
+#python2 ./lean.py "print(c('1 + 2'))"
 #./lean.py "_print(c('1 + 2'))"
-#./lean.py "print(c('1 + 2'))"
 # https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 # https://www.programiz.com/python-programming/methods/built-in/exec
 # https://www.geeksforgeeks.org/python-program-to-convert-a-list-to-string/
@@ -5218,18 +5199,7 @@ if len(sys.argv) > 1:
 		exec( sys.argv[1] )
 
 
-
-
-
-
-
-
-
-
-
 _main()
-
-
 
 CZXWXcRMTo8EmM8i4d
 }
@@ -5404,6 +5374,9 @@ _init_deps() {
 	export enUb_stopwatch=""
 	
 	export enUb_linux=""
+	
+	export enUb_python=""
+	export enUb_haskell=""
 	
 	export enUb_calculators=""
 }
@@ -5693,6 +5666,13 @@ _deps_stopwatch() {
 # ie. _test_linux must not require Linux-only binaries
 _deps_linux() {
 	export enUb_linux="true"
+}
+
+_deps_python() {
+	export enUb_python="true"
+}
+_deps_haskell() {
+	export enUb_haskell="true"
 }
 
 _deps_calculators() {
@@ -6134,6 +6114,9 @@ _compile_bash_deps() {
 		_deps_distro
 		_deps_linux
 		
+		_deps_python
+		_deps_haskell
+		
 		_deps_calculators
 		
 		#_deps_queue
@@ -6182,6 +6165,9 @@ _compile_bash_deps() {
 	then
 		_deps_dev
 		
+		_deps_python
+		_deps_haskell
+		
 		_deps_calculators
 		
 		_deps_channel
@@ -6195,6 +6181,9 @@ _compile_bash_deps() {
 	if [[ "$1" == "abstract" ]] || [[ "$1" == "abstractfs" ]]
 	then
 		_deps_dev
+		
+		_deps_python
+		_deps_haskell
 		
 		_deps_calculators
 		
@@ -6212,6 +6201,9 @@ _compile_bash_deps() {
 	if [[ "$1" == "fakehome" ]]
 	then
 		_deps_dev
+		
+		_deps_python
+		_deps_haskell
 		
 		_deps_calculators
 		
@@ -6258,6 +6250,9 @@ _compile_bash_deps() {
 		_deps_msw
 		_deps_fakehome
 		_deps_abstractfs
+		
+		_deps_python
+		_deps_haskell
 		
 		_deps_calculators
 		
@@ -6342,6 +6337,9 @@ _compile_bash_deps() {
 		_deps_fakehome
 		_deps_abstractfs
 		
+		_deps_python
+		_deps_haskell
+		
 		_deps_calculators
 		
 		_deps_channel
@@ -6424,6 +6422,9 @@ _compile_bash_deps() {
 		_deps_msw
 		_deps_fakehome
 		_deps_abstractfs
+		
+		_deps_python
+		_deps_haskell
 		
 		_deps_calculators
 		
@@ -6614,6 +6615,13 @@ _compile_bash_utilities() {
 _compile_bash_utilities_java() {
 	[[ "$enUb_java" == "true" ]] && includeScriptList+=( "special/java"/java.sh )
 #	[[ "$enUb_java" == "true" ]] && includeScriptList+=( "special/java"/javac.sh )
+}
+
+_compile_bash_utilities_python() {
+	[[ "$enUb_python" == "true" ]] && includeScriptList+=( "build/python"/python.sh )
+}
+_compile_bash_utilities_haskell() {
+	[[ "$enUb_haskell" == "true" ]] && includeScriptList+=( "build/haskell"/haskell.sh )
 }
 
 _compile_bash_utilities_virtualization() {
@@ -7067,6 +7075,8 @@ _compile_bash() {
 	_compile_bash_utilities
 	_compile_bash_utilities_prog
 	_compile_bash_utilities_java
+	_compile_bash_utilities_python
+	_compile_bash_utilities_haskell
 	_compile_bash_utilities_virtualization
 	_compile_bash_utilities_virtualization_prog
 	

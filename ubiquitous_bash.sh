@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='2422982188'
+export ub_setScriptChecksum_contents='633474540'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -12347,6 +12347,16 @@ _test() {
 	
 	_getDep yes
 	
+	
+	
+	_getDep perl
+	
+	
+	_tryExec "_test_python"
+	_tryExec "_test_haskell"
+	
+	
+	
 	_test_readlink_f
 	
 	_tryExec "_test_package"
@@ -12950,6 +12960,7 @@ _test_prog() {
 	_wantGetDep mkudffs
 	_wantGetDep dvd+rw-format
 	_wantGetDep growisofs
+	#! _wantGetDep growisofs && _wantGetDep mkisofs
 	_wantGetDep udevadm
 	
 	_wantGetDep gdisk
@@ -12958,6 +12969,31 @@ _test_prog() {
 	_wantGetDep partprobe
 	_wantGetDep blkdiscard
 	
+	
+	_wantGetDep blockdev
+	_wantGetDep xxd
+	_wantGetDep udevadm
+	_wantGetDep partprobe
+	_wantGetDep findmnt
+	_wantGetDep stat
+	#_wantGetDep bc
+	_wantGetDep cryptsetup
+	_wantGetDep lsblk
+	_wantGetDep fdisk
+	_wantGetDep badblocks
+	_wantGetDep blkid
+	_wantGetDep xz
+	
+	
+	_wantGetDep btrfs
+	_wantGetDep wipe
+	
+	
+	_wantGetDep mount.nilfs2
+	
+	
+	_getDep pv
+	_wantGetDep libhistory.so.8
 	
 	_messagePASS
 	
@@ -14515,6 +14551,7 @@ _vector_veracrypt() {
 _test_veracrypt() {
 	_getDep cryptsetup
 	
+	#_getDep '/usr/share/lintian/overrides/libwxgtk3.0-gtk3-0v5'
 	
 	_veracrypt_binOverride
 	
@@ -16352,14 +16389,7 @@ class ubPythonPS1(object):
 sys.ps1 = ubPythonPS1()
 sys.ps2 = "\x01\033[0;96m\x02|...\x01\033[0m\x02 "
 
-
-
-
 #_python()
-
-
-
-
 
 CZXWXcRMTo8EmM8i4d
 }
@@ -16368,6 +16398,9 @@ CZXWXcRMTo8EmM8i4d
 _generate_lean-overrides-python_here() {
 	cat << 'CZXWXcRMTo8EmM8i4d'
 
+# WARNING: Strongly discouraged example.
+# (strongly prefer to inherit a single os.environ['scriptAbsoluteFolder'] environment variable from being called by an 'ubiquitous_bash' script)
+#exec(open(_getScriptAbsoluteFolder()+'/lean.py').read())
 
 
 
@@ -16376,37 +16409,21 @@ _generate_lean-overrides-python_here() {
 
 
 
+
+
+
+# ATTENTION: NOTICE: Environment variables from 'ubiquitous_bash' can be used to import other python scripts.
+#exec(open(os.environ['scriptAbsoluteFolder']+'/lean.py').read())
 
 #################################################
-# ATTENTION: Add '_prog' script code here!
-
-
-
-
-
-
+# ATTENTION: NOTICE: Add '_prog' script code here!
 
 def _main():
 	pass
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ATTENTION: Add '_prog' script code here!
+# ATTENTION: NOTICE: Add '_prog' script code here!
 #################################################
 
 
@@ -16416,9 +16433,10 @@ if sys.hexversion > 0x03000000:
 
 import sys
 import string
-#./lean.py "_python(c('1 + 2'))"
+#./lean.py "_python(c('1 + 2'))" #FAIL
+#python3 ./lean.py "_print(c('1 + 2'))"
+#python2 ./lean.py "print(c('1 + 2'))"
 #./lean.py "_print(c('1 + 2'))"
-#./lean.py "print(c('1 + 2'))"
 # https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 # https://www.programiz.com/python-programming/methods/built-in/exec
 # https://www.geeksforgeeks.org/python-program-to-convert-a-list-to-string/
@@ -16432,18 +16450,7 @@ if len(sys.argv) > 1:
 		exec( sys.argv[1] )
 
 
-
-
-
-
-
-
-
-
-
 _main()
-
-
 
 CZXWXcRMTo8EmM8i4d
 }

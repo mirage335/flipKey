@@ -662,6 +662,7 @@ _vector_veracrypt() {
 _test_veracrypt() {
 	_getDep cryptsetup
 	
+	#_getDep '/usr/share/lintian/overrides/libwxgtk3.0-gtk3-0v5'
 	
 	_veracrypt_binOverride
 	

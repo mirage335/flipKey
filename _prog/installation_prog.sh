@@ -81,6 +81,7 @@ _test_prog() {
 	_wantGetDep mkudffs
 	_wantGetDep dvd+rw-format
 	_wantGetDep growisofs
+	#! _wantGetDep growisofs && _wantGetDep mkisofs
 	_wantGetDep udevadm
 	
 	_wantGetDep gdisk
@@ -89,6 +90,31 @@ _test_prog() {
 	_wantGetDep partprobe
 	_wantGetDep blkdiscard
 	
+	
+	_wantGetDep blockdev
+	_wantGetDep xxd
+	_wantGetDep udevadm
+	_wantGetDep partprobe
+	_wantGetDep findmnt
+	_wantGetDep stat
+	#_wantGetDep bc
+	_wantGetDep cryptsetup
+	_wantGetDep lsblk
+	_wantGetDep fdisk
+	_wantGetDep badblocks
+	_wantGetDep blkid
+	_wantGetDep xz
+	
+	
+	_wantGetDep btrfs
+	_wantGetDep wipe
+	
+	
+	_wantGetDep mount.nilfs2
+	
+	
+	_getDep pv
+	_wantGetDep libhistory.so.8
 	
 	_messagePASS
 	
