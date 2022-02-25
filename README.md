@@ -312,6 +312,17 @@ Ongoing obsolescence and some use cases may necessitate new 'archival reliabilit
 
 
 # Reference
+https://en.wikipedia.org/wiki/EARN_IT_Act#Legislative_history
+	&#39;reintroduced by Lindsey Graham and Richard Blumenthal in February 2022[16] and passed unanimously by the Senate Judiciary Committee.[17]&#39;
+	-
+	&#39;former Attorney General Barr has extensively argued that the use of end-to-end encryption by online services can obstruct investigations by law enforcement, especially those involving child exploitation and has pushed for a governmental backdoor into encryption services&#39;
+	&#39;The Senators behind EARN IT have stated that there is no intent to bring any such encryption backdoors with this legislation.[29] However, according to The Washington Post, Richard Blumenthal said that "lawmakers wouldn&#39;t offer a blanket exemption to using encryption as evidence, arguing companies might use it as a &#39;get-out-of-jail-free card.&#39;"[30][31]&#39;
+	-
+	&#39;As an implicit response to EARN IT, Wyden along with House Representative Anna G. Eshoo proposed a new bill, the Invest in Child Safety Act, in May 2020 that would give US$5 billion to the Department of Justice to give additional manpower and tools to enable them to address child exploitation directly rather than to rely on technology companies to rein in the problem.[36]&#39;
+
+https://www.washingtonpost.com/politics/2022/02/23/most-cyber-pros-give-thumbs-down-earn-it-act/
+
+
 
 https://web.archive.org/web/20020921015009/http://www.bis.doc.gov/Encryption/PubAvailEncSourceCodeNofify.html
 https://en.wikipedia.org/wiki/Nothing-up-my-sleeve_number
