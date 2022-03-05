@@ -4,6 +4,8 @@
 # NOTICE: README !
 # 
 # Simple script to desilver, partition, format, and install flipKey, to removable media discs (eg. mo640, zip250).
+# DANGER: Usually, a disc must be 'desilvered' to best ensure erasure. Especially this is true of flash/SSD (due to wear leveling) and 'packetDisc' (due to wear leveling, extra redundant key files, and complicated use of UDF filesystem headers as 'keyPartition' combined with key files).
+# DANGER: Magneto-Optical discs using 'keyPartition' may be relatively easily erased by 'purge/create/etc', but assuming such erasure succeeds without duly considering the underlying hardware involved for any kind of storage, is a risky habit.
 # 
 # 
 # ATTENTION
