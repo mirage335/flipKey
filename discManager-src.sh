@@ -1759,7 +1759,8 @@ _disk_declare() {
 	export flipKey_physical='true'
 	
 	
-	export flipKey_headerKeySize=6291456
+	export flipKey_headerKeySize=6299648
+	[[ "$MSWcompatible" == "true" ]] && export flipKey_headerKeySize=6291456
 	export flipKey_containerSize=$(bc <<< "scale=0; ( ( "$(df --block-size=1 --output=avail "$scriptLocal" | tr -dc '0-9')" / 1.01 ) * 1 ) - 128000000")
 	
 	# Reducing the size of the container hopefully might keep data a few millimeters away from the edges, where contamination due to 'handling' of the disc may be visually noticeable before data loss occurs.
