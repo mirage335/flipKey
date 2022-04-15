@@ -12,11 +12,8 @@ _mix_keyfile_vector() {
 
 
 # NOTICE: Either pipe to password, or to keyfile, or to temporary (strictly ramdisk, permissions already set, etc) keyfile.
-#_mix_keyfile "$flipKey_headerKeyFile"
-#_mix_keyfile "$flipKey_headerKeyFile" | head -c 2097152
-#_mix_keyfile "$flipKey_headerKeyFile" "summary" | head -c 16384
-#_mix_keyfile "$flipKey_headerKeyFile" "summary" | head -c 64
-#_mix_keyfile "$flipKey_headerKeyFile" | pv -L 1K
+#local flipKey_headerKeyFile_summary
+#flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
 # https://veracrypt.eu/en/docs/keyfiles-technical-details/
 #  'maximum size of a keyfile is not limited; however, only its first 1,048,576 bytes (1 MB) are processed (all remaining bytes are ignored due to performance issues connected with processing extremely large files)'
 # https://www.reddit.com/r/VeraCrypt/comments/aqatqi/is_it_possible_to_use_a_password_longer_than_64/
@@ -24,6 +21,10 @@ _mix_keyfile_vector() {
 # https://sourceware.org/legacy-ml/cygwin/2005-03/msg00702.html
 #  'nothing currently in Cygwin that does RAM disks -- in fact, Cygwin usually uses the underlying Windows filesystem drivers'
 # https://stackoverflow.com/questions/56821662/piping-a-passphrase-to-veracrypt-with-popen-is-it-secure
+# https://stackoverflow.com/questions/7395157/windows-equivalent-to-dev-stdin
+# https://documentation.help/VeraCrypt/Command%20Line%20Usage.html
+#  'Warning: This method of entering a volume password may be insecure, for example, when an unencrypted command prompt history log is being saved to unencrypted disk.'
+#   Implying such CLI parameters are not otherwise visible to all programs as may be the case with typical Linux.
 _mix_keyfile() {
 	_mix_keyfile_vector
 	
@@ -36,12 +37,25 @@ _mix_keyfile() {
 	
 	#echo -n "$current_key_sha512" | cat - "$1"
 	
-	if [[ $(head -c 1000000 "$1" | wc -c | tr -dc '0-9') -ge "1000000" ]] || [[ "$2" == "summary" ]]
+	#if [[ $(head -c 1000000 "$1" | wc -c | tr -dc '0-9') -ge "1000000" ]] || [[ "$2" == "summary" ]]
+	#then
+		#cat "$1" | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9' | cat - "$1"
+	#else
+		#cat "$1"
+	#fi
+	
+	
+	# https://security.stackexchange.com/questions/154636/how-safe-are-local-variables
+	unset flipKey_headerKeyFile_summary
+	local flipKey_headerKeyFile_summary
+	
+	if [[ "$2" == "summary" ]] || [[ $(head -c 1000000 "$1" | wc -c | tr -dc '0-9') -ge "1000000" ]]
 	then
-		cat "$1" | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9' | cat - "$1"
+		flipKey_headerKeyFile_summary=$(cat "$1" | sha512sum | head -c 60 | tr -dc 'A-Za-z0-9')
 	else
-		cat "$1"
+		flipKey_headerKeyFile_summary=
 	fi
+	echo "$flipKey_headerKeyFile_summary"
 }
 
 
@@ -713,7 +727,7 @@ _pattern_keyfile_vector() {
 
 
 _vector_veracrypt_generate_literal_procedure() {
-	_messagePlain_nominal 'init: _vector_veracrypt_generate_literal_procedure'
+	_messageNormal 'init: _vector_veracrypt_generate_literal_procedure'
 	
 	mkdir -p "$scriptLib"/vector/literal
 	mkdir -p "$scriptLib"/vector/literal/fs
@@ -774,7 +788,7 @@ _vector_veracrypt_generate_literal_procedure() {
 }
 
 _vector_veracrypt_generate_summary_procedure() {
-	_messagePlain_nominal 'init: _vector_veracrypt_generate_summary_procedure'
+	_messageNormal 'init: _vector_veracrypt_generate_summary_procedure'
 	
 	mkdir -p "$scriptLib"/vector/summary
 	mkdir -p "$scriptLib"/vector/summary/fs
@@ -786,6 +800,13 @@ _vector_veracrypt_generate_summary_procedure() {
 	
 	_pattern_keyfile_vector > "$scriptLib"/vector/summary/c-h-flipKey
 	
+	
+	local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary")
+	[[ "$flipKey_headerKeyFile_summary" != $(echo "2c1b16122c8a566adc6a58e9810af4f6db2f08aedc998b0b5834cb32892c" | head -c 60) ]] && _messageFAIL
+	
+	
+	
 	if _if_cygwin
 	then
 		local cygwin_flipKey_container
@@ -794,13 +815,17 @@ _vector_veracrypt_generate_summary_procedure() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt_format /create "$cygwin_flipKey_container" /keyfile /proc/self/fd/0 /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
+		#_messagePlain_probe_cmd
+		_messagePlain_probe veracrypt_format /create "$cygwin_flipKey_container" /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
+		veracrypt_format /create "$cygwin_flipKey_container" /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		sudo -n chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
+		#_messagePlain_probe_cmd
+		_messagePlain_probe veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
+		veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		echo 'text' > /cygdrive/u/from_msw.txt
@@ -812,13 +837,13 @@ _vector_veracrypt_generate_summary_procedure() {
 		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 	else
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt -t --create --size "524288" --volume-type=normal "$scriptLib"/vector/summary/container.vc --encryption=AES --hash=sha-512 --filesystem=fat --keyfiles=/proc/self/fd/0 --random-source=/dev/urandom --non-interactive
+		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --size "524288" --volume-type=normal "$scriptLib"/vector/summary/container.vc --encryption=AES --hash=sha-512 --filesystem=fat --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey --random-source=/dev/urandom --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		sudo -n chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --keyfiles=/proc/self/fd/0 "$scriptLib"/vector/summary/fs --force --non-interactive
+		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey "$scriptLib"/vector/summary/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		echo 'text' > "$scriptLib"/vector/summary/fs/from_nix.txt
@@ -836,6 +861,7 @@ _vector_veracrypt_generate_summary_procedure() {
 
 
 _vector_veracrypt_generate() {
+	
 	_veracrypt_binOverride
 	
 	
@@ -852,14 +878,22 @@ _vector_veracrypt_generate() {
 
 _vector_veracrypt_mount() {
 	
+	_messageNormal '_vector_veracrypt_mount: literal'
+	
 	[[ ! -e "$scriptLib"/vector/literal/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/literal/fs
 	# "$scriptLib"/vector/literal/container.vc
 	# "$scriptLib"/vector/literal/c-h-flipKey
 	
+	local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$scriptLib"/vector/literal/c-h-flipKey)
+	[[ "$flipKey_headerKeyFile_summary" != $(echo "" | head -c 60) ]] && _messageFAIL
+	
 	if _if_cygwin
 	then
+		_messagePlain_nominal '_vector_veracrypt_mount: literal: unspecified'
+		
 		local cygwin_flipKey_container
 		cygwin_flipKey_container=$(cygpath --windows "$scriptLib"/vector/literal/container.vc)
 		
@@ -881,7 +915,27 @@ _vector_veracrypt_mount() {
 		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 	else
+		_messagePlain_nominal '_vector_veracrypt_mount: literal: unspecified'
+		
 		_messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/literal/container.vc --keyfiles="$scriptLib"/vector/literal/c-h-flipKey "$scriptLib"/vector/literal/fs --force --non-interactive
+		[[ "$?" != "0" ]] && _messageError 'FAIL'
+		
+		#echo 'text' > "$scriptLib"/vector/literal/fs/common.txt
+		if [[ -e "$scriptLib"/vector/literal/fs/common.txt ]]
+		then
+			_messagePlain_good 'good: found: common.txt'
+		else
+			_messagePlain_bad 'bad: missing: common.txt'
+			_messageError 'FAIL'
+		fi
+		
+		_messagePlain_probe_cmd veracrypt -t --dismount "$scriptLib"/vector/literal/container.vc --force --non-interactive
+		[[ "$?" != "0" ]] && _messageFAIL
+		
+		
+		_messagePlain_nominal '_vector_veracrypt_mount: literal: specified'
+		
+		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/literal/container.vc --stdin --keyfiles="$scriptLib"/vector/literal/c-h-flipKey "$scriptLib"/vector/literal/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageError 'FAIL'
 		
 		#echo 'text' > "$scriptLib"/vector/literal/fs/common.txt
@@ -899,11 +953,17 @@ _vector_veracrypt_mount() {
 	
 	
 	
+	_messageNormal '_vector_veracrypt_mount: summary'
+	
 	[[ ! -e "$scriptLib"/vector/summary/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/summary/fs
 	# "$scriptLib"/vector/summary/container.vc
 	# "$scriptLib"/vector/summary/c-h-flipKey
+	
+	#local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary")
+	[[ "$flipKey_headerKeyFile_summary" != $(echo "2c1b16122c8a566adc6a58e9810af4f6db2f08aedc998b0b5834cb32892c" | head -c 60) ]] && _messageFAIL
 	
 	if _if_cygwin
 	then
@@ -913,28 +973,9 @@ _vector_veracrypt_mount() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" > "$scriptLib"/vector/summary/c-h-flipKey.summary
-		[[ $(cat "$scriptLib"/vector/summary/c-h-flipKey.summary | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9') != "a6bf0c25d3d25ab27bcc99189e5b74ba4e31b8de55eba445acbd6a0b2e409e53fe6b333ed5f09b4253ab958d9fb834756b4f16e21e792fabd4761f202321976d" ]] && _messageFAIL
-		
-		
-		_messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile "$cygwin_flipKey_headerKeyFile".summary /tryemptypass y /force /silent /quit
-		[[ "$?" != "0" ]] && _messageFAIL
-		
-		#echo 'text' > /cygdrive/u/common.txt
-		if [[ -e /cygdrive/u/common.txt ]]
-		then
-			_messagePlain_good 'good: found: common.txt'
-		else
-			_messagePlain_bad 'bad: missing: common.txt'
-			_messageError 'FAIL'
-		fi
-		
-		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
-		[[ "$?" != "0" ]] && _messageFAIL
-		
-		
-		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
+		#_messagePlain_probe_cmd
+		_messagePlain_probe veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
+		veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		#echo 'text' > /cygdrive/u/common.txt
@@ -949,27 +990,7 @@ _vector_veracrypt_mount() {
 		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 	else
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" > "$scriptLib"/vector/summary/c-h-flipKey.summary
-		[[ $(cat "$scriptLib"/vector/summary/c-h-flipKey.summary | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9') != "a6bf0c25d3d25ab27bcc99189e5b74ba4e31b8de55eba445acbd6a0b2e409e53fe6b333ed5f09b4253ab958d9fb834756b4f16e21e792fabd4761f202321976d" ]] && _messageFAIL
-		
-		_messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --keyfiles="$scriptLib"/vector/summary/c-h-flipKey.summary "$scriptLib"/vector/summary/fs --force --non-interactive
-		[[ "$?" != "0" ]] && _messageFAIL
-		
-		#echo 'text' > "$scriptLib"/vector/summary/fs/common.txt
-		if [[ -e "$scriptLib"/vector/summary/fs/common.txt ]]
-		then
-			_messagePlain_good 'good: found: common.txt'
-		else
-			_messagePlain_bad 'bad: missing: common.txt'
-			_messageError 'FAIL'
-		fi
-		
-		_messagePlain_probe_cmd veracrypt -t --dismount "$scriptLib"/vector/summary/container.vc --force --non-interactive
-		[[ "$?" != "0" ]] && _messageFAIL
-		
-		
-		
-		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --keyfiles=/proc/self/fd/0 "$scriptLib"/vector/summary/fs --force --non-interactive
+		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey "$scriptLib"/vector/summary/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		#echo 'text' > "$scriptLib"/vector/summary/fs/common.txt
