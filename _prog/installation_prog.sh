@@ -122,6 +122,9 @@ _test_prog() {
 	_getDep pv
 	_wantGetDep libhistory.so.8
 	
+	# Only for automatic installation of veracrypt.
+	_wantGetDep expect
+	
 	_messagePASS
 	
 	_tryExec "_vectors_crypto"

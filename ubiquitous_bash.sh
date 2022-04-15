@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='928937469'
+export ub_setScriptChecksum_contents='1608236944'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -13022,6 +13022,11 @@ _test() {
 	_getDep perl
 	
 	
+	# WARNING: Avoid if possible.
+	# Not needed by 'ubiquitous_bash' itself up to at least commit 51ba42ed50b24a0e6eca749e8db7bee5c52cce47 .
+	_wantGetDep expect
+	
+	
 	_tryExec "_test_python"
 	_tryExec "_test_haskell"
 	
@@ -13684,6 +13689,9 @@ _test_prog() {
 	
 	_getDep pv
 	_wantGetDep libhistory.so.8
+	
+	# Only for automatic installation of veracrypt.
+	_wantGetDep expect
 	
 	_messagePASS
 	
@@ -15606,6 +15614,80 @@ _test_veracrypt() {
 	
 	! man grep | grep '\-\-fixed\-strings' > /dev/null 2>&1 && echo 'warn: missing: grep: fixed-strings'
 	true
+}
+
+
+
+
+
+_get_veracrypt() {
+	_messagePlain_nominal 'init: _get_veracrypt'
+	if type veracrypt > /dev/null 2>&1
+	then
+		_messagePlain_good 'good: found: veracrypt'
+	fi
+	
+	if _if_cygwin && type "choco"
+	then
+		choco install veracrypt -y
+		return
+	fi
+	
+	
+	_start
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
+	cd "$safeTmp"
+	
+	
+	
+	# https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-setup.tar.bz2
+	export currentVeracryptURL=$(wget -q -O - 'https://www.veracrypt.fr/en/Downloads.html' | grep https | grep 'tar\.bz2' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.bz2.*$/\.tar\.bz2/' | sed 's/&#43;/+/g' | tr -dc 'a-zA-Z0-9.:\=\_\-/%+')
+	export currentVeracryptName=$(_safeEcho_newline "$currentVeracryptURL" | sed 's/^.*\///' | sed 's/\.tar\.bz2$//')
+	
+	wget "$currentVeracryptURL"
+	
+	tar xf "$currentVeracryptName".tar.bz2
+	
+	
+	#./veracrypt-1.25.9-setup-gui-x64 --nox11 --quiet
+	
+	
+	_getDep expect
+	
+	
+	
+	# https://stackoverflow.com/questions/58239247/veracript-install-script-fails-if-run-from-script
+	# -console-x64
+	# -gui-x64
+	echo '#!/usr/bin/expect -f
+
+set timeout -1
+spawn '"$safeTmp"/"$currentVeracryptName"-gui-x64'
+expect "To select, enter 1 or 2:"
+send -- "1\r"
+expect "Press Enter to display the license terms..."
+send -- "\r"
+expect ":"
+send -- "q\r"
+expect "Do you accept and agree to be bound by the license terms?"
+send -- "yes\r"
+expect "Press Enter to exit..."
+send -- "\r"
+expect eof' > "$safeTmp"/veracrypt.exp
+	
+	expect -f "$safeTmp"/veracrypt.exp
+	
+	cd "$functionEntryPWD"
+	
+	
+	if ! type veracrypt > /dev/null 2>&1
+	then
+		_messagePlain_bad 'bad: missing: veracrypt'
+		_messageFAIL
+	fi
+	_stop
 }
 
 

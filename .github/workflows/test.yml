@@ -46,10 +46,15 @@ jobs:
           rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
         timeout-minutes: 5
       - uses: actions/checkout@v2
-      - name: _getMinimal_cloud
+      #- name: _getMinimal_cloud
+        #shell: bash
+        #run: |
+          #./ubiquitous_bash.sh _getMinimal_cloud
+        #timeout-minutes: 90
+      - name: _get_veracrypt
         shell: bash
         run: |
-          ./ubiquitous_bash.sh _getMinimal_cloud
+          ./ubiquitous_bash.sh _get_veracrypt
         timeout-minutes: 90
       - name: test-flipKey
         shell: bash
@@ -118,7 +123,7 @@ jobs:
           7z -y x ./package_ubcp-core.7z | tee /_getCore_ubcp.log
           rm ./package_ubcp-core.7z
       - uses: actions/checkout@v2
-      - name: _getMinimal_cloud
+      - name: _get_veracrypt
         shell: pwsh
         timeout-minutes: 180
         run: |
