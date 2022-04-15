@@ -25,6 +25,8 @@ _vectors_crypto() {
 	
 	_messageNormal "Vectors (crypto)..."
 	
+	_tryExec "_mix_keyfile_vector"
+	
 	_tryExec "_vector_rand-flipKey"
 	_tryExec "_vector_openssl-flipKey"
 	
@@ -41,6 +43,10 @@ _test_prog() {
 	_messagePASS
 	
 	_messageNormal "Program..."
+	
+	_getDep md5sum
+	_getDep sha512sum
+	
 	
 	_getDep python3
 	
