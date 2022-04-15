@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='1396250378'
+export ub_setScriptChecksum_contents='479138645'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14598,7 +14598,8 @@ _mix_keyfile_vector() {
 }
 
 
-# NOTICE: Either pipe to password, or to keyfile, or to temporary (strictly ramdisk, permissions already set, etc) keyfile.
+# NOTICE: Summarize entire keyfile, forcing veracrypt to rely on entire keyfile.
+# DANGER: Using hashes as passwords, without any keyfile, would entirely rely on correct hashing, correct passing of the hash, and no writing of the hash, which in the multi-platform use cases veracrypt is compatible with, may be risky assumptions.
 #local flipKey_headerKeyFile_summary
 #flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
 # https://veracrypt.eu/en/docs/keyfiles-technical-details/
@@ -15465,6 +15466,8 @@ _vector_veracrypt_generate() {
 
 _vector_veracrypt_mount() {
 	
+	_veracrypt_binOverride
+	
 	_messageNormal '_vector_veracrypt_mount: literal'
 	
 	[[ ! -e "$scriptLib"/vector/literal/c-h-flipKey ]] && _messageFAIL
@@ -15479,6 +15482,8 @@ _vector_veracrypt_mount() {
 	
 	if _if_cygwin
 	then
+		_messagePlain_nominal '_vector_veracrypt_mount: literal: unspecified'
+		
 		local cygwin_flipKey_container
 		cygwin_flipKey_container=$(cygpath --windows "$scriptLib"/vector/literal/container.vc)
 		

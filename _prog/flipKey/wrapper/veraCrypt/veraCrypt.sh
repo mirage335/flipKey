@@ -11,7 +11,8 @@ _mix_keyfile_vector() {
 }
 
 
-# NOTICE: Either pipe to password, or to keyfile, or to temporary (strictly ramdisk, permissions already set, etc) keyfile.
+# NOTICE: Summarize entire keyfile, forcing veracrypt to rely on entire keyfile.
+# DANGER: Using hashes as passwords, without any keyfile, would entirely rely on correct hashing, correct passing of the hash, and no writing of the hash, which in the multi-platform use cases veracrypt is compatible with, may be risky assumptions.
 #local flipKey_headerKeyFile_summary
 #flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
 # https://veracrypt.eu/en/docs/keyfiles-technical-details/
@@ -877,6 +878,8 @@ _vector_veracrypt_generate() {
 
 
 _vector_veracrypt_mount() {
+	
+	_veracrypt_binOverride
 	
 	_messageNormal '_vector_veracrypt_mount: literal'
 	
