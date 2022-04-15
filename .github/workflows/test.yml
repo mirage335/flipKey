@@ -1,0 +1,183 @@
+
+# WARNING: May be untested .
+
+name: test
+on:
+  push:
+  workflow_dispatch:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    #- cron: '5 1 * * 6'
+    #- cron: '5 1 * * 2,4'
+    #- cron: '5 1 * * 2'
+    #- cron: '5 1 * * 4'
+    - cron: '5 1 * * 5'
+
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_latest:
+    runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: ubuntu-18.04
+    steps:
+      - name: _getCore_ub
+        shell: bash
+        timeout-minutes: 90
+        run: |
+          mkdir -p ~/core/infrastructure
+          cd ~/core/infrastructure
+          git clone --depth 1 --recursive https://github.com/mirage335/ubiquitous_bash.git
+          cd ubiquitous_bash
+          ./_setupUbiquitous.bat
+      - name: _getMinimal_cloud
+        shell: bash
+        run: |
+          ~/core/infrastructure/ubiquitous_bash/ubiquitous_bash.sh _getMinimal_cloud
+        timeout-minutes: 90
+      - name: write! secrets
+        shell: bash
+        run: |
+          ~/core/infrastructure/ubiquitous_bash/ubiquitous_bash.sh _prepare_rclone_limited_file
+        env:
+          rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
+        timeout-minutes: 5
+      - uses: actions/checkout@v2
+      - name: _getMinimal_cloud
+        shell: bash
+        run: |
+          ./ubiquitous_bash.sh _getMinimal_cloud
+        timeout-minutes: 90
+      - name: test-flipKey
+        shell: bash
+        run: |
+          ./_test | sudo -n tee /_test-flipKey.log
+        timeout-minutes: 90
+      - name: _vector_veracrypt_generate
+        shell: bash
+        run: |
+          ./_bin.bat _vector_veracrypt_generate
+        timeout-minutes: 90
+      - name: _vector_veracrypt_mount
+        shell: bash
+        run: |
+          ./_bin.bat _vector_veracrypt_mount
+        timeout-minutes: 90
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        # ssh -i <path-to-key> <tmate-connection-string>
+        with:
+          limit-access-to-actor: true
+        timeout-minutes: 25
+  # Other 'ubcp' tests must be essentially identical.
+  # sleep 120
+  # rclone --progress --config /rclone.conf copy distLLC_release_ro:ubcp/package_ubcp-core.7z ./
+  test_ubcp_release_mswLatest:
+    runs-on: windows-latest
+    #runs-on: windows-2022
+    #runs-on: windows-2019
+    steps:
+      - name: write! secrets
+        id: secret-file1
+        run: |
+          $secretFile = "/rclone.conf"
+          $encodedBytes = [System.Convert]::FromBase64String($env:rclone_limited_conf_base64)
+          Set-Content $secretFile -Value $encodedBytes -AsByteStream
+        shell: pwsh
+        env:
+          rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
+      - name: _getMinimal_cloud
+        shell: pwsh
+        timeout-minutes: 180
+        run: |
+          $ErrorActionPreference="SilentlyContinue"
+          $ErrorActionPreference = "Continue"
+          Set-MpPreference -DisableRealtimeMonitoring $true
+          date > /wasHere.log
+          pwd >> /wasHere.log
+          cat /wasHere.log
+          choco install qalculate -y
+          choco install dos2unix -y
+          choco install nmap -y
+          git config --global core.autocrlf input
+          git config --global core.eol lf
+          choco install 7zip.install -y
+          choco install rclone -y
+      - name: _getCore_ubcp
+        shell: pwsh
+        timeout-minutes: 180
+        run: |
+          mkdir /core
+          mkdir /core/infrastructure
+          cd /core/infrastructure
+          rclone --progress --config /rclone.conf copy distLLC_release_ro:ubcp/package_ubcp-core.7z ./
+          7z -y x ./package_ubcp-core.7z | tee /_getCore_ubcp.log
+          rm ./package_ubcp-core.7z
+      - uses: actions/checkout@v2
+      - name: _getMinimal_cloud
+        shell: pwsh
+        timeout-minutes: 180
+        run: |
+          $ErrorActionPreference="SilentlyContinue"
+          $ErrorActionPreference = "Continue"
+          choco install veracrypt -y
+      - name: statement! ls
+        shell: pwsh
+        run: |
+          ls /
+          ls
+          Get-CimInstance -ClassName Win32_LogicalDisk | Select-Object -Property DeviceID,@{'Name' = 'FreeSpace (GB)'
+          Expression= { [int]($_.FreeSpace / 1GB) }}
+      - name: _test-flipKey
+        shell: pwsh
+        timeout-minutes: 240
+        run: |
+          ./_test | tee /_test-flipKey.log
+          $SEL = cat /_test-flipKey.log | Select-String -Pattern 'FAIL' -CaseSensitive -SimpleMatch
+          if ($SEL -ne $null)
+          {
+          cat /bin/false/pwsh
+          }
+          else
+          {
+          echo true | Out-Null
+          }
+      - name: _vector_veracrypt_generate
+        shell: pwsh
+        timeout-minutes: 240
+        run: |
+          ./_bin.bat _vector_veracrypt_generate | tee /_vector_veracrypt_generate.log
+          $SEL = cat /_vector_veracrypt_generate.log | Select-String -Pattern 'FAIL' -CaseSensitive -SimpleMatch
+          if ($SEL -ne $null)
+          {
+          cat /bin/false/pwsh
+          }
+          else
+          {
+          echo true | Out-Null
+          }
+      - name: _vector_veracrypt_mount
+        shell: pwsh
+        timeout-minutes: 240
+        run: |
+          ./_bin.bat _vector_veracrypt_mount | tee /_vector_veracrypt_mount.log
+          $SEL = cat /_vector_veracrypt_mount.log | Select-String -Pattern 'FAIL' -CaseSensitive -SimpleMatch
+          if ($SEL -ne $null)
+          {
+          cat /bin/false/pwsh
+          }
+          else
+          {
+          echo true | Out-Null
+          }
+
+#  test_ubcp_dump_mswLTS:
+
+
+
+
+
