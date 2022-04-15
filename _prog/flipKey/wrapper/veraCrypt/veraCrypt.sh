@@ -794,13 +794,13 @@ _vector_veracrypt_generate_summary_procedure() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
-		_mix_keyfile "$cygwin_flipKey_headerKeyFile" "summary" | _messagePlain_probe_cmd veracrypt_format /create "$cygwin_flipKey_container" /keyfile /proc/self/fd/0 /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
+		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt_format /create "$cygwin_flipKey_container" /keyfile /proc/self/fd/0 /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		sudo -n chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		
-		_mix_keyfile "$cygwin_flipKey_headerKeyFile" "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
+		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		echo 'text' > /cygdrive/u/from_msw.txt
@@ -913,8 +913,8 @@ _vector_veracrypt_mount() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
-		_mix_keyfile "$cygwin_flipKey_headerKeyFile" "summary" > "$cygwin_flipKey_headerKeyFile".summary
-		[[ $(cat "$cygwin_flipKey_headerKeyFile".summary | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9') != "a6bf0c25d3d25ab27bcc99189e5b74ba4e31b8de55eba445acbd6a0b2e409e53fe6b333ed5f09b4253ab958d9fb834756b4f16e21e792fabd4761f202321976d" ]] && _messageFAIL
+		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" > "$scriptLib"/vector/summary/c-h-flipKey.summary
+		[[ $(cat "$scriptLib"/vector/summary/c-h-flipKey.summary | sha512sum | head -c 128 | tr -dc 'A-Za-z0-9') != "a6bf0c25d3d25ab27bcc99189e5b74ba4e31b8de55eba445acbd6a0b2e409e53fe6b333ed5f09b4253ab958d9fb834756b4f16e21e792fabd4761f202321976d" ]] && _messageFAIL
 		
 		
 		_messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile "$cygwin_flipKey_headerKeyFile".summary /tryemptypass y /force /silent /quit
@@ -934,7 +934,7 @@ _vector_veracrypt_mount() {
 		
 		
 		
-		_mix_keyfile "$cygwin_flipKey_headerKeyFile" "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
+		_mix_keyfile "$scriptLib"/vector/summary/c-h-flipKey "summary" | _messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile /proc/self/fd/0 /tryemptypass y /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		#echo 'text' > /cygdrive/u/common.txt

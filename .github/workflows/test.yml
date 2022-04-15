@@ -54,7 +54,7 @@ jobs:
       - name: test-flipKey
         shell: bash
         run: |
-          ./_test | sudo -n tee /_test-flipKey.log
+          ./_test.bat | sudo -n tee /_test-flipKey.log
         timeout-minutes: 90
       - name: _vector_veracrypt_generate
         shell: bash
@@ -136,7 +136,7 @@ jobs:
         shell: pwsh
         timeout-minutes: 240
         run: |
-          ./_test | tee /_test-flipKey.log
+          ./_test.bat | tee /_test-flipKey.log
           $SEL = cat /_test-flipKey.log | Select-String -Pattern 'FAIL' -CaseSensitive -SimpleMatch
           if ($SEL -ne $null)
           {
