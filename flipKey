@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='479138645'
+export ub_setScriptChecksum_contents='648837760'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14601,7 +14601,7 @@ _mix_keyfile_vector() {
 # NOTICE: Summarize entire keyfile, forcing veracrypt to rely on entire keyfile.
 # DANGER: Using hashes as passwords, without any keyfile, would entirely rely on correct hashing, correct passing of the hash, and no writing of the hash, which in the multi-platform use cases veracrypt is compatible with, may be risky assumptions.
 #local flipKey_headerKeyFile_summary
-#flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
+#flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
 # https://veracrypt.eu/en/docs/keyfiles-technical-details/
 #  'maximum size of a keyfile is not limited; however, only its first 1,048,576 bytes (1 MB) are processed (all remaining bytes are ignored due to performance issues connected with processing extremely large files)'
 # https://www.reddit.com/r/VeraCrypt/comments/aqatqi/is_it_possible_to_use_a_password_longer_than_64/
@@ -14670,6 +14670,9 @@ _veracrypt_create() {
 _veracrypt_create_procedure() {
 	_messageNormal 'init: _veracrypt_create'
 	
+	local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
+	
 	if ( [[ "$flipKey_filesystem" == "nilfs2" ]] || [[ "$flipKey_filesystem_alternate" == "nilfs2" ]] ) && ! sudo -n "$scriptAbsoluteLocation" _typeDep mkfs.nilfs2
 	then
 		_messagePlain_bad 'fail: create: missing: nilfs2'
@@ -14730,13 +14733,19 @@ _veracrypt_create_procedure() {
 		
 		if [[ "$flipKey_packetDisc_writeOnce" != "true" ]]
 		then
-			_messagePlain_probe_cmd veracrypt_format /create "$cygwin_flipKey_container" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /force /silent
+			echo "$flipKey_headerKeyFile_summary" | wc -c
+			#_messagePlain_probe_cmd
+			_messagePlain_probe veracrypt_format /create "$cygwin_flipKey_container" /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /force /silent
+			veracrypt_format /create "$cygwin_flipKey_container" /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /force /silent
 			currentExitStatus="$?"
 		else
+			echo "$flipKey_headerKeyFile_summary" | wc -c
 			# eg. writeOnce , fastFormat
 			# WARNING: Experimental . May be untested.
 			# DANGER: May be ineffective.
-			_messagePlain_probe_cmd veracrypt_format /create "$cygwin_flipKey_container" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /dynamic /force /silent
+			#_messagePlain_probe_cmd
+			_messagePlain_probe veracrypt_format /create "$cygwin_flipKey_container" /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /dynamic /force /silent
+			veracrypt_format /create "$cygwin_flipKey_container" /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem "$flipKey_filesystem" /size "$flipKey_containerSize" /dynamic /force /silent
 			currentExitStatus="$?"
 		fi
 		
@@ -14774,25 +14783,29 @@ _veracrypt_create_procedure() {
 			then
 				# https://kifarunix.com/how-to-use-veracrypt-on-command-line-to-encrypt-drives-on-ubuntu-18-04/
 				# https://wiki.archlinux.org/title/TrueCrypt#Accessing_a_TrueCrypt_or_VeraCrypt_container_using_cryptsetup
-				_messagePlain_probe_cmd veracrypt -t --create --size "$flipKey_containerSize" --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
+				echo "$flipKey_headerKeyFile_summary" | wc -c
+				echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --size "$flipKey_containerSize" --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --stdin --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
 				currentExitStatus="$?"
 			else
 				# eg. writeOnce , fastFormat
 				# WARNING: Experimental . May be untested.
 				# DANGER: May be ineffective.
-				_messagePlain_probe_cmd veracrypt -t --create --size "$flipKey_containerSize" --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --quick --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
+				echo "$flipKey_headerKeyFile_summary" | wc -c
+				echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --size "$flipKey_containerSize" --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --quick --stdin --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
 				currentExitStatus="$?"
 			fi
 		else
 			if [[ "$flipKey_packetDisc_writeOnce" != "true" ]]
 			then
-				_messagePlain_probe_cmd veracrypt -t --create --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
+				echo "$flipKey_headerKeyFile_summary" | wc -c
+				echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --stdin --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
 				currentExitStatus="$?"
 			else
 				# eg. writeOnce , fastFormat
 				# WARNING: Experimental . May be untested.
 				# DANGER: May be ineffective.
-				_messagePlain_probe_cmd veracrypt -t --create --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --quick --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
+				echo "$flipKey_headerKeyFile_summary" | wc -c
+				echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --volume-type=normal "$flipKey_container" --encryption=AES --hash=sha-512 --filesystem="$flipKey_filesystem" --quick --stdin --keyfiles="$flipKey_headerKeyFile" --random-source=/dev/urandom --non-interactive
 				currentExitStatus="$?"
 			fi
 		fi
@@ -14817,7 +14830,8 @@ _veracrypt_create_procedure() {
 			done
 			
 			currentIterations=0
-			while [[ "$currentIterations" -lt 30 ]] && ! _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+			echo "$flipKey_headerKeyFile_summary" | wc -c
+			while [[ "$currentIterations" -lt 30 ]] && ! echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
 			do
 				sync
 				sleep 3
@@ -15051,6 +15065,9 @@ _veracrypt_mount() {
 _veracrypt_mount_procedure() {
 	_messageNormal 'init: _veracrypt_mount'
 	
+	local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
+	
 	if [[ "$flipKey_headerKeyFile" != "/dev/"* ]] || [[ "$flipKey_headerKeyFile" == "/dev/shm/"* ]]
 	then
 		[[ $(cat "$flipKey_headerKeyFile" | wc -c | tr -dc '0-9') != "$flipKey_headerKeySize" ]] && _messagePlain_bad 'fail: size' && return 1
@@ -15082,7 +15099,10 @@ _veracrypt_mount_procedure() {
 		# https://documentation.help/VeraCrypt/Command%20Line%20Usage.html
 		# Adding '/m ro' may not be effective.
 		# https://www.reddit.com/r/VeraCrypt/comments/7dqwxi/how_to_mount_a_volume_from_the_windows_command/
-		_messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter "$flipKey_MSWdrive" /nowaitdlg /secureDesktop n /history n /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
+		echo "$flipKey_headerKeyFile_summary" | wc -c
+		#_messagePlain_probe_cmd
+		_messagePlain_probe veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter "$flipKey_MSWdrive" /nowaitdlg /secureDesktop n /history n /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
+		veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter "$flipKey_MSWdrive" /nowaitdlg /secureDesktop n /history n /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		currentExitStatus="$?"
 		
 		[[ "$currentExitStatus" == "0" ]] && _messagePlain_good 'good: mount'
@@ -15096,7 +15116,8 @@ _veracrypt_mount_procedure() {
 		mkdir -p "$flipKey_mount"
 		sudo -n mkdir -p "$flipKey_mount"
 		
-		_messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+		echo "$flipKey_headerKeyFile_summary" | wc -c
+		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
 		currentExitStatus="$?"
 		
 		sync
@@ -15403,6 +15424,7 @@ _vector_veracrypt_generate_summary_procedure() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		#_messagePlain_probe_cmd
 		_messagePlain_probe veracrypt_format /create "$cygwin_flipKey_container" /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
 		veracrypt_format /create "$cygwin_flipKey_container" /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /hash sha512 /encryption aes /filesystem fat /size "524288" /force /silent
@@ -15411,6 +15433,7 @@ _vector_veracrypt_generate_summary_procedure() {
 		chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		sudo -n chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		#_messagePlain_probe_cmd
 		_messagePlain_probe veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
@@ -15425,12 +15448,14 @@ _vector_veracrypt_generate_summary_procedure() {
 		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 	else
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --create --size "524288" --volume-type=normal "$scriptLib"/vector/summary/container.vc --encryption=AES --hash=sha-512 --filesystem=fat --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey --random-source=/dev/urandom --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
 		chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		sudo -n chown "$USER":"$USER" "$scriptLib"/vector/summary/container.vc
 		
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey "$scriptLib"/vector/summary/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
@@ -15493,8 +15518,8 @@ _vector_veracrypt_mount() {
 		_messagePlain_probe_cmd veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 		
-		#echo 'text' > "$scriptLib"/vector/literal/fs/common.txt
-		if [[ -e "$scriptLib"/vector/literal/fs/common.txt ]]
+		#echo 'text' > /cygdrive/u/common.txt
+		if [[ -e /cygdrive/u/common.txt ]]
 		then
 			_messagePlain_good 'good: found: common.txt'
 		else
@@ -15525,6 +15550,7 @@ _vector_veracrypt_mount() {
 		
 		_messagePlain_nominal '_vector_veracrypt_mount: literal: specified'
 		
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/literal/container.vc --stdin --keyfiles="$scriptLib"/vector/literal/c-h-flipKey "$scriptLib"/vector/literal/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageError 'FAIL'
 		
@@ -15563,6 +15589,7 @@ _vector_veracrypt_mount() {
 		local cygwin_flipKey_headerKeyFile
 		cygwin_flipKey_headerKeyFile=$(cygpath --windows "$scriptLib"/vector/summary/c-h-flipKey)
 		
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		#_messagePlain_probe_cmd
 		_messagePlain_probe veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "SUMMARY" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
 		veracrypt /hash sha512 /volume "$cygwin_flipKey_container" /letter 'U' /nowaitdlg /secureDesktop n /history n /password "$flipKey_headerKeyFile_summary" /keyfile "$cygwin_flipKey_headerKeyFile" /tryemptypass y /force /silent /quit
@@ -15580,6 +15607,7 @@ _vector_veracrypt_mount() {
 		_messagePlain_probe_cmd veracrypt /dismount 'U' /nowaitdlg /secureDesktop n /history n /force /silent /quit
 		[[ "$?" != "0" ]] && _messageFAIL
 	else
+		echo "$flipKey_headerKeyFile_summary" | wc -c
 		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$scriptLib"/vector/summary/container.vc --stdin --keyfiles="$scriptLib"/vector/summary/c-h-flipKey "$scriptLib"/vector/summary/fs --force --non-interactive
 		[[ "$?" != "0" ]] && _messageFAIL
 		
