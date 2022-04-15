@@ -1077,7 +1077,7 @@ _get_veracrypt() {
 	echo '#!/usr/bin/expect -f
 
 set timeout -1
-spawn '"$safeTmp"/"$currentVeracryptName"-gui-x64'
+spawn '"$safeTmp"/"$currentVeracryptName"-console-x64'
 expect "To select, enter 1 or 2:"
 send -- "1\r"
 expect "Press Enter to display the license terms..."
