@@ -908,6 +908,8 @@ _vector_veracrypt_mount() {
 	
 	_messageNormal '_vector_veracrypt_mount: literal'
 	
+	mkdir -p "$scriptLib"/vector/literal
+	mkdir -p "$scriptLib"/vector/literal/fs
 	[[ ! -e "$scriptLib"/vector/literal/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/literal/fs
@@ -984,6 +986,8 @@ _vector_veracrypt_mount() {
 	
 	_messageNormal '_vector_veracrypt_mount: summary'
 	
+	mkdir -p "$scriptLib"/vector/summary
+	mkdir -p "$scriptLib"/vector/summary/fs
 	[[ ! -e "$scriptLib"/vector/summary/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/summary/fs

@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='648837760'
+export ub_setScriptChecksum_contents='2340019127'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15495,6 +15495,8 @@ _vector_veracrypt_mount() {
 	
 	_messageNormal '_vector_veracrypt_mount: literal'
 	
+	mkdir -p "$scriptLib"/vector/literal
+	mkdir -p "$scriptLib"/vector/literal/fs
 	[[ ! -e "$scriptLib"/vector/literal/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/literal/fs
@@ -15571,6 +15573,8 @@ _vector_veracrypt_mount() {
 	
 	_messageNormal '_vector_veracrypt_mount: summary'
 	
+	mkdir -p "$scriptLib"/vector/summary
+	mkdir -p "$scriptLib"/vector/summary/fs
 	[[ ! -e "$scriptLib"/vector/summary/c-h-flipKey ]] && _messageFAIL
 	
 	# "$scriptLib"/vector/summary/fs
