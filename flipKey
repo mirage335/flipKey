@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='810256375'
+export ub_setScriptChecksum_contents='1891667434'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -7531,6 +7531,16 @@ _setupUbiquitous() {
 	ln -sf "$ubcoreUBfile" "$ubHome"/bin/_winehere
 	ln -sf "$ubcoreUBfile" "$ubHome"/bin/_winecfghere
 	
+	echo '#!/bin/bash
+"$HOME"/bin/ubiquitous_bash.sh _vncf "$@"' > "$ubHome"/bin/vncf
+	chmod u+x "$ubHome"/bin/vncf
+	
+	echo '#!/bin/bash
+"$HOME"/bin/ubiquitous_bash.sh _sshf "$@"' > "$ubHome"/bin/sshf
+	chmod u+x "$ubHome"/bin/vncf
+	
+	
+	
 	_setupUbiquitous_here > "$ubcoreFile"
 	_setupUbiquitous_accessories_bashrc >> "$ubcoreFile"
 	! [[ -e "$ubcoreFile" ]] && _messagePlain_bad 'missing: ubcoreFile= '"$ubcoreFile" && _messageFAIL && return 1
@@ -12398,6 +12408,29 @@ _variableLocalTest_sequence() {
 	false && _currentFunctionDefinitionTest() { echo false; }
 	[[ $(_currentFunctionDefinitionTest) != "true" ]] && _messageFAIL && _stop 1
 	unset _currentFunctionDefinitionTest
+	
+	
+	local doubleLocalDefinitionA
+	doubleLocalDefinitionA=1
+	local doubleLocalDefinitionA
+	doubleLocalDefinitionA=2
+	[[ "$doubleLocalDefinitionA" != "2" ]] && _messageFAIL && _stop 1
+	local doubleLocalDefinitionA=3
+	[[ "$doubleLocalDefinitionA" != "3" ]] && _messageFAIL && _stop 1
+	local doubleLocalDefinitionA
+	doubleLocalDefinitionA=4
+	[[ "$doubleLocalDefinitionA" != "4" ]] && _messageFAIL && _stop 1
+	export doubleLocalDefinitionA=5
+	[[ "$doubleLocalDefinitionA" != "5" ]] && _messageFAIL && _stop 1
+	local doubleLocalDefinitionA=6
+	[[ "$doubleLocalDefinitionA" != "6" ]] && _messageFAIL && _stop 1
+	doubleLocalDefinitionA=7
+	[[ "$doubleLocalDefinitionA" != "7" ]] && _messageFAIL && _stop 1
+	local doubleLocalDefinitionA=8
+	[[ "$doubleLocalDefinitionA" != "8" ]] && _messageFAIL && _stop 1
+	unset doubleLocalDefinitionA
+	[[ "$doubleLocalDefinitionA" != "" ]] && _messageFAIL && _stop 1
+	
 	
 	_stop
 }
