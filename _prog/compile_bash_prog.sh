@@ -13,12 +13,14 @@ _compile_bash_deps_prog() {
 		#_deps_git
 		#_deps_bup
 		
-		# Include the extremely common applications (ie. 'dd) for disk repo shortcuts.
+		# Include the extremely common applications (ie. 'dd') for disk repo shortcuts.
 		_deps_repo
 		
 		_deps_calculators
 		
 		_deps_disc
+		
+		_deps_getVeracrypt
 		
 		return 0
 	fi
