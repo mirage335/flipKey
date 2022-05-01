@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='1533611101'
+export ub_setScriptChecksum_contents='3969020750'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -13907,46 +13907,46 @@ _test_prog() {
 		#echo 'warn: missing: kpartx'
 	fi
 	
-	_wantGetDep mkudffs
-	_wantGetDep dvd+rw-format
-	_wantGetDep growisofs
-	#! _wantGetDep growisofs && _wantGetDep mkisofs
-	_wantGetDep udevadm
+	_wantGetDep mkudffs || echo 'warn: missing: mkudffs'
+	_wantGetDep dvd+rw-format || echo 'warn: missing: dvd+rw-format'
+	_wantGetDep growisofs || echo 'warn: missing: growisofs'
+	! _wantGetDep genisoimage && ! _wantGetDep mkisofs && echo 'warn: missing: genisoimage'
+	_wantGetDep udevadm || echo 'warn: missing: udevadm'
 	
-	_wantGetDep gdisk
-	_wantGetDep sgdisk
-	_wantGetDep blkid
-	_wantGetDep partprobe
-	_wantGetDep blkdiscard
-	
-	
-	_wantGetDep blockdev
-	_wantGetDep xxd
-	_wantGetDep udevadm
-	_wantGetDep partprobe
-	_wantGetDep findmnt
-	_wantGetDep stat
-	#_wantGetDep bc
-	_wantGetDep cryptsetup
-	_wantGetDep lsblk
-	_wantGetDep fdisk
-	_wantGetDep badblocks
-	_wantGetDep blkid
-	_wantGetDep xz
+	_wantGetDep gdisk || echo 'warn: missing: gdisk'
+	_wantGetDep sgdisk || echo 'warn: missing: sgdisk'
+	_wantGetDep blkid || echo 'warn: missing: blkid'
+	_wantGetDep partprobe || echo 'warn: missing: partprobe'
+	_wantGetDep blkdiscard || echo 'warn: missing: blkdiscard'
 	
 	
-	_wantGetDep btrfs
-	_wantGetDep wipe
+	_wantGetDep blockdev || echo 'warn: missing: blockdev'
+	_wantGetDep xxd || echo 'warn: missing: xxd'
+	_wantGetDep udevadm || echo 'warn: missing: udevadm'
+	_wantGetDep partprobe || echo 'warn: missing: partprobe'
+	_wantGetDep findmnt || echo 'warn: missing: findmnt'
+	_wantGetDep stat || echo 'warn: missing: stat'
+	#_wantGetDep bc || echo 'warn: missing: blkdiscard'
+	_wantGetDep cryptsetup || echo 'warn: missing: cryptsetup'
+	_wantGetDep lsblk || echo 'warn: missing: lsblk'
+	_wantGetDep fdisk || echo 'warn: missing: fdisk'
+	_wantGetDep badblocks || echo 'warn: missing: badblocks'
+	_wantGetDep blkid || echo 'warn: missing: blkid'
+	_wantGetDep xz || echo 'warn: missing: xz'
 	
 	
-	_wantGetDep mount.nilfs2
+	_wantGetDep btrfs || echo 'warn: missing: btrfs'
+	_wantGetDep wipe || echo 'warn: missing: wipe'
 	
 	
-	_getDep pv
-	_wantGetDep libhistory.so.8
+	_wantGetDep mount.nilfs2 || echo 'warn: missing: mount.nilfs2'
+	
+	
+	_getDep pv || echo 'warn: missing: pv'
+	_wantGetDep libhistory.so.8 || echo 'warn: missing: libhistory.so.8'
 	
 	# Only for automatic installation of veracrypt.
-	_wantGetDep expect
+	_wantGetDep expect || echo 'warn: missing: expect'
 	
 	_messagePASS
 	
