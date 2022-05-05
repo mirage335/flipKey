@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+[[ "$PATH" != *"/usr/local/bin"* ]] && [[ -e "/usr/local/bin" ]] && export PATH=/usr/local/bin:"$PATH"
+[[ "$PATH" != *"/usr/bin"* ]] && [[ -e "/usr/bin" ]] && export PATH=/usr/bin:"$PATH"
+[[ "$PATH" != *"/bin:"* ]] && [[ -e "/bin" ]] && export PATH=/bin:"$PATH"
+
 if [[ "$ub_setScriptChecksum" != "" ]]
 then
 	export ub_setScriptChecksum=
@@ -31,8 +35,8 @@ _ub_cksum_special_derivativeScripts_contents() {
 
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
-export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='3969020750'
+export ub_setScriptChecksum_header='2591634041'
+export ub_setScriptChecksum_contents='3116987325'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -3615,6 +3619,11 @@ _messageProcess() {
 	return 0
 }
 
+
+_sep() {
+	echo '________________________________________'
+}
+
 _mustcarry() {
 	grep "$1" "$2" > /dev/null 2>&1 && return 0
 	
@@ -4756,7 +4765,16 @@ _visualPrompt() {
 	#export PS1='\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[01;31m\]${?}:${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u\[\033[01;32m\]@\h\[\033[01;36m\]\[\033[01;34m\])\[\033[01;36m\]\[\033[01;34m\]-'"$prompt_cloudNetName"'(\[\033[01;35m\]$(date +%H:%M:%S\.%d)\[\033[01;34m\])\[\033[01;36m\]|\[\033[00m\]\n\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[37m\][\w]\[\033[00m\]\n\[\033[01;36m\]\[\033[01;34m\]|$PS1_lineNumberText\[\033[01;34m\]) \[\033[36m\]'""'>\[\033[00m\] '
 	
 	
-	export PS1='\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[01;31m\]${?}:${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u\[\033[01;32m\]@\h\[\033[01;36m\]\[\033[01;34m\])\[\033[01;36m\]\[\033[01;34m\]-'"$prompt_cloudNetName"'(\[\033[01;35m\]$(date +%H:%M:%S\.%d)\[\033[01;34m\])\[\033[01;36m\]|\[\033[00m\]\n\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[37m\][\w]\[\033[00m\]\n\[\033[01;36m\]\[\033[01;34m\]|$([[ "$PS1_lineNumber" == "1" ]] && echo -e -n '"'"'\[\033[01;36m\]'"'"'$PS1_lineNumber || echo -e -n $PS1_lineNumber)\[\033[01;34m\]) \[\033[36m\]'""'>\[\033[00m\] '
+	if [[ "$SHELL" == *"/nix/store/"*"/bin/bash"* ]]
+	then
+		export prompt_nixShell="nixShell"
+	else
+		export prompt_nixShell=""
+	fi
+	
+	export PS1='\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[01;31m\]${?}:${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u\[\033[01;32m\]@\h\[\033[01;36m\]\[\033[01;34m\])\[\033[01;36m\]\[\033[01;34m\]-'"$prompt_cloudNetName"'(\[\033[01;35m\]$(date +%H:%M:%S\.%d)\[\033[01;34m\])\[\033[01;36m\]|\[\033[00m\]'"$prompt_nixShell"'\n\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[37m\][\w]\[\033[00m\]\n\[\033[01;36m\]\[\033[01;34m\]|$([[ "$PS1_lineNumber" == "1" ]] && echo -e -n '"'"'\[\033[01;36m\]'"'"'$PS1_lineNumber || echo -e -n $PS1_lineNumber)\[\033[01;34m\]) \[\033[36m\]'""'>\[\033[00m\] '
+	
+	#export PS1="$prompt_nixShell""$PS1"
 }
 
 
@@ -7204,7 +7222,13 @@ CZXWXcRMTo8EmM8i4d
 
 
 
+_setupUbiquitous_accessories_here-nixenv-bashrc() {
+	cat << CZXWXcRMTo8EmM8i4d
 
+[[ -e "$HOME"/.nix-profile/etc/profile.d/nix.sh ]] && . "$HOME"/.nix-profile/etc/profile.d/nix.sh
+
+CZXWXcRMTo8EmM8i4d
+}
 
 
 
@@ -7289,6 +7313,7 @@ _setupUbiquitous_accessories-python() {
 
 
 
+
 _setupUbiquitous_accessories() {
 	
 	_setupUbiquitous_accessories-gnuoctave "$@"
@@ -7303,7 +7328,14 @@ _setupUbiquitous_accessories_bashrc() {
 	
 	_setupUbiquitous_accessories_bashrc-cloud_bin "$@"
 	
+	_setupUbiquitous_accessories_here-nixenv-bashrc "$@"
+	
+	#echo true
+	
+	# WARNING: Python must remain last. Failure to hook python is a failure that must show as an error exit status from the users profile (a red "1" on the first line of first visual prompt command prompt).
 	_setupUbiquitous_accessories_here-python_bashrc "$@"
+	
+	#echo true
 }
 
 
@@ -12716,6 +12748,267 @@ _test_parallelFifo_sequence() {
 	_stop
 }
 
+_test_pipe_true() {
+	true | tee /dev/null 2>&1
+}
+
+# Apparently, shell script functions and conditions default to pipefail or pipestatus, although "$scriptAbsoluteLocation" is able to use the exit status instead.
+_test_pipe_false() {
+	false | tee /dev/null 2>&1
+}
+_test_pipe_false_condition() {
+	#false | tee /dev/null 2>&1 && return 0
+	false | echo stuff | grep stuff > /dev/null 2>&1 && return 0
+	return 1
+}
+_test_pipe_false_condition_special() {
+	false | tee /dev/null
+	[[ "$?" == "0" ]] && return 0
+	return 1
+}
+
+# Expect return true (ie. 0).
+_test_pipefail_forcePlus_true_sequence() {
+	set +o pipefail
+	true | tee /dev/null 2>&1
+}
+_test_pipefail_forcePlus_true() {
+	"$scriptAbsoluteLocation" _test_pipefail_forcePlus_true_sequence "$@"
+}
+
+# Expect return true (ie. 0).
+_test_pipefail_forcePlus_false_sequence() {
+	set +o pipefail
+	false | tee /dev/null 2>&1
+}
+_test_pipefail_forcePlus_false() {
+	"$scriptAbsoluteLocation" _test_pipefail_forcePlus_false_sequence "$@"
+}
+
+# Expect return true (ie. 0).
+_test_pipefail_forceMinus_true_sequence() {
+	set -o pipefail
+	true | tee /dev/null 2>&1
+}
+_test_pipefail_forceMinus_true() {
+	"$scriptAbsoluteLocation" _test_pipefail_forceMinus_true_sequence "$@"
+}
+
+# Expect return false (ie. 1).
+_test_pipefail_forceMinus_false_sequence() {
+	set -o pipefail
+	false | tee /dev/null 2>&1
+}
+_test_pipefail_forceMinus_false() {
+	"$scriptAbsoluteLocation" _test_pipefail_forceMinus_false_sequence "$@"
+}
+
+# https://stackoverflow.com/questions/6871859/piping-command-output-to-tee-but-also-save-exit-code-of-command
+_test_pipestatus_true() {
+	true | tee /dev/null 2>&1
+	return ${PIPESTATUS[0]}
+}
+
+_test_pipestatus_false() {
+	false | tee /dev/null 2>&1
+	return ${PIPESTATUS[0]}
+}
+
+# ATTENTION: NOTICE: Regard this as a relatively definitive specification of known bash pipe 'exit status', 'pipestatus', 'pipefail', defaults and inheritance.
+# WARNING: If 'bash' software interpreter uses same code paths (eg. for shell functions and subshells) do not assume this will always remain the case. Test and consider specifically and explicitly.
+_test_pipefail_sequence_sequence() {
+	if ! _test_pipefail_forcePlus_true || ! _test_pipefail_forcePlus_false || ! _test_pipefail_forceMinus_true_sequence || _test_pipefail_forceMinus_false_sequence
+	then
+		echo 'fail: pipefail'
+		_stop 1
+		return 1
+	fi
+	
+	# NOTICE: Will FAIL if 'set -o pipefail' applies to script commands !
+	if ! _test_pipestatus_true || _test_pipestatus_false || ! "$scriptAbsoluteLocation" _test_pipestatus_true || "$scriptAbsoluteLocation" _test_pipestatus_false
+	then
+		echo 'fail: pipestatus'
+		_stop 1
+		return 1
+	fi
+	
+	
+	
+	# ATTENTION: Apparently, "$scriptAbsoluteLocation" is able to correctly retrieve the expected (ie. 0, true) exit status of both '_test_pipe_true' and '_test_pipe_false', although calling these functions directly results in the unexpected use of pipestatus, pipefail, or similar, etc.
+	# CAUTION: While such defaults may seem slightly undesirable for shell scripts, there may be some benefit to command prompt use (especailly when functions are called from an interactive shell through such as ubiquitous_bash.sh _true , etc), UNIX pipe input programs (eg. cat /file) rarely if ever fail when a grep match would occur, and best practice of using a condition (ie. [[ -e /file ]]) before such pipes already avoids severe issues in shell script usage.
+	# CAUTION: Ensure all pipe exit status, pipe status, and pipe fail, default behavior remains *strictly* as-is.
+	
+	
+	
+	# ATTENTION: ! _test_pipe_false ... would return true if consistent with behavior when called by "$scriptAbsoluteLocation"
+	_test_pipe_false
+	[[ "$?" == "0" ]] && echo 'fail: _test_pipe_false' && _stop 1 && return 1
+	if _test_pipe_false
+	then
+		echo 'fail: _test_pipe_false'
+		_stop 1
+		return 1
+	fi
+	
+	# ATTENTION: ! _test_pipe_false ... does return true if called by "$scriptAbsoluteLocation"
+	! "$scriptAbsoluteLocation" _test_pipe_false
+	[[ "$?" == "0" ]] && echo 'fail: ! "$scriptAbsoluteLocation" _test_pipe_false' && _stop 1 && return 1
+	if ! "$scriptAbsoluteLocation" _test_pipe_false
+	then
+		echo 'fail: if: ! "$scriptAbsoluteLocation" _test_pipe_false'
+		_stop 1
+		return 1
+	fi
+	
+	_test_pipe_false_condition
+	[[ "$?" == "0" ]] && echo 'fail: _test_pipe_false_condition' && _stop 1 && return 1
+	if _test_pipe_false_condition
+	then
+		echo 'fail: if: _test_pipe_false_condition'
+		_stop 1
+		return 1
+	fi
+	
+	! "$scriptAbsoluteLocation" _test_pipe_false_condition
+	[[ "$?" == "0" ]] && echo 'fail: ! "$scriptAbsoluteLocation" _test_pipe_false_condition' && _stop 1 && return 1
+	if _test_pipe_false_condition
+	then
+		echo 'fail: if: ! "$scriptAbsoluteLocation" _test_pipe_false_condition'
+		_stop 1
+		return 1
+	fi
+	
+	
+	_test_pipe_false_condition_special
+	[[ "$?" == "0" ]] && echo 'fail: _test_pipe_false_condition_special' && _stop 1 && return 1
+	if _test_pipe_false_condition_special
+	then
+		echo 'fail: if: _test_pipe_false_condition_special'
+		_stop 1
+		return 1
+	fi
+	
+	! "$scriptAbsoluteLocation" _test_pipe_false_condition_special
+	[[ "$?" == "0" ]] && echo 'fail: ! "$scriptAbsoluteLocation" _test_pipe_false_condition_special' && _stop 1 && return 1
+	if ! "$scriptAbsoluteLocation" _test_pipe_false_condition_special
+	then
+		echo 'fail: if: ! "$scriptAbsoluteLocation" _test_pipe_false_condition_special'
+		_stop 1
+		return 1
+	fi
+	
+	"$scriptAbsoluteLocation" _test_pipe_false_condition_special
+	[[ "$?" != "0" ]] && echo 'fail: "$scriptAbsoluteLocation" _test_pipe_false_condition_special' && _stop 1 && return 1
+	if "$scriptAbsoluteLocation" _test_pipe_false_condition_special
+	then
+		true
+	else
+		echo 'fail: if: "$scriptAbsoluteLocation" _test_pipe_false_condition_special'
+		_stop 1
+		return 1
+	fi
+	
+	
+	#! _test_pipe_true || ! _test_pipe_false || ! "$scriptAbsoluteLocation" _test_pipe_true || ! "$scriptAbsoluteLocation" _test_pipe_false
+	#! _test_pipe_false
+	if ! _test_pipe_true || ! "$scriptAbsoluteLocation" _test_pipe_true || ! "$scriptAbsoluteLocation" _test_pipe_false
+	then
+		echo 'fail: if: pipe: value'
+		_stop 1
+		return 1
+	fi
+	
+	set +o pipefail
+	# NOTICE: Will FAIL if 'set -o pipefail' applies to script commands !
+	if ! _test_pipestatus_true || _test_pipestatus_false || ! "$scriptAbsoluteLocation" _test_pipestatus_true || "$scriptAbsoluteLocation" _test_pipestatus_false
+	then
+		echo 'fail: pipestatus'
+		_stop 1
+		return 1
+	fi
+	if ( true | tee /dev/null 2>&1 )
+	then
+		true
+	else
+		echo 'fail: if: pipe: pipefail: plus: subshell: true'
+		_stop 1
+		return 1
+	fi
+	if ( false | tee /dev/null 2>&1 )
+	then
+		true
+	else
+		echo 'fail: if: pipe: pipefail: plus: subshell: false'
+		_stop 1
+		return 1
+	fi
+	if ! "$scriptAbsoluteLocation" _test_pipe_true || ! "$scriptAbsoluteLocation" _test_pipe_false
+	then
+		echo 'fail: if: pipe: pipefail: plus'
+		_stop 1
+		return 1
+	fi
+	
+	set -o pipefail
+	# NOTICE: Will FAIL if 'set -o pipefail' applies to script commands !
+	if ! _test_pipestatus_true || _test_pipestatus_false || ! "$scriptAbsoluteLocation" _test_pipestatus_true || "$scriptAbsoluteLocation" _test_pipestatus_false
+	then
+		echo 'fail: pipestatus'
+		_stop 1
+		return 1
+	fi
+	if ( true | tee /dev/null 2>&1 )
+	then
+		true
+	else
+		echo 'fail: if: pipe: pipefail: minus: subshell: true'
+		_stop 1
+		return 1
+	fi
+	# ATTENTION: Seems this actually is sensitive to 'set -o pipefail' .
+	if ( false | tee /dev/null 2>&1 )
+	then
+		echo 'fail: if: pipe: pipefail: minus: subshell: false'
+		_stop 1
+		return 1
+	else
+		true
+	fi
+	if ! "$scriptAbsoluteLocation" _test_pipe_true || ! "$scriptAbsoluteLocation" _test_pipe_false
+	then
+		echo 'fail: if: pipe: pipefail: minus'
+		_stop 1
+		return 1
+	fi
+	return 0
+}
+_test_pipefail_sequence() {
+	! "$scriptAbsoluteLocation" _test_pipefail_sequence_sequence "$@" && return 1
+	
+	set +o pipefail
+	! "$scriptAbsoluteLocation" _test_pipefail_sequence_sequence "$@" && return 1
+	
+	set -o pipefail
+	! "$scriptAbsoluteLocation" _test_pipefail_sequence_sequence "$@" && return 1
+	
+	return 0
+}
+_test_pipefail() {
+	if ! "$scriptAbsoluteLocation" _test_pipefail_sequence "$@"
+	then
+		_messageFAIL
+		_stop 1
+		return 1
+	fi
+	"$scriptAbsoluteLocation" _test_pipefail_sequence "$@"
+	if [[ "$?" != "0" ]]
+	then
+		_messageFAIL
+		_stop 1
+		return 1
+	fi
+}
+
 _test_sanity() {
 	if (exit 0)
 	then
@@ -12789,6 +13082,12 @@ _test_sanity() {
 	
 	# Do NOT allow 'rm' to be a shell function alias to 'rm -i' or similar.
 	[[ $(type -p rm) == "" ]] && _messageFAIL && return 1
+	
+	
+	! _test_pipefail && _messageFAIL && return 1
+	
+	
+	
 	
 	#! [[ -2147483648 -lt 2147483647 ]] && _messageFAIL && return 1
 	#! [[ -2000000000 -lt 2000000000 ]] && _messageFAIL && return 1
@@ -13391,6 +13690,8 @@ _test() {
 	_tryExec "_test_cloud"
 	
 	_tryExec "_test_rclone"
+	_tryExec "_test_croc"
+	
 	_tryExec "_test_terraform"
 	
 	
@@ -13410,6 +13711,9 @@ _test() {
 	_tryExec "_test_metaengine"
 	
 	_tryExec "_test_channel"
+	
+	_tryExec "_test_nix-env"
+	
 	
 	! [[ -e /dev/urandom ]] && echo /dev/urandom missing && _stop 1
 	[[ $(_timeout 3 cat /dev/urandom 2> /dev/null | _timeout 3 base64 2> /dev/null | _timeout 3 tr -dc 'a-zA-Z0-9' 2> /dev/null | _timeout 3 head -c 18 2> /dev/null) == "" ]] && echo /dev/urandom fail && _stop 1

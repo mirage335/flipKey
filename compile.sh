@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+[[ "$PATH" != *"/usr/local/bin"* ]] && [[ -e "/usr/local/bin" ]] && export PATH=/usr/local/bin:"$PATH"
+[[ "$PATH" != *"/usr/bin"* ]] && [[ -e "/usr/bin" ]] && export PATH=/usr/bin:"$PATH"
+[[ "$PATH" != *"/bin:"* ]] && [[ -e "/bin" ]] && export PATH=/bin:"$PATH"
+
 if [[ "$ub_setScriptChecksum" != "" ]]
 then
 	export ub_setScriptChecksum=
@@ -31,8 +35,8 @@ _ub_cksum_special_derivativeScripts_contents() {
 
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
-export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='3969998651'
+export ub_setScriptChecksum_header='2591634041'
+export ub_setScriptChecksum_contents='1035238676'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -3603,6 +3607,11 @@ _messageProcess() {
 	return 0
 }
 
+
+_sep() {
+	echo '________________________________________'
+}
+
 _mustcarry() {
 	grep "$1" "$2" > /dev/null 2>&1 && return 0
 	
@@ -6129,6 +6138,9 @@ _generate_compile_bash-compressed_procedure() {
 	#sed -i 'N;s/\n//'
 	
 	echo "#!/usr/bin/env bash" > "$scriptAbsoluteFolder"/"$1"_compressed.sh
+	echo '[[ "$PATH" != *"/usr/local/bin"* ]] && [[ -e "/usr/local/bin" ]] && export PATH=/usr/local/bin:"$PATH"
+[[ "$PATH" != *"/usr/bin"* ]] && [[ -e "/usr/bin" ]] && export PATH=/usr/bin:"$PATH"
+[[ "$PATH" != *"/bin:"* ]] && [[ -e "/bin" ]] && export PATH=/bin:"$PATH"' >> "$scriptAbsoluteFolder"/"$1"_compressed.sh
 	
 	_compressed_criticalDep() {
 		! _getAbsolute_criticalDep && exit 1
@@ -7020,6 +7032,11 @@ _compile_bash_utilities() {
 	( [[ "$enUb_notLean" == "true" ]] || [[ "$enUb_getMinimal" == "true" ]] || [[ "$enUb_getMost_special_veracrypt" == "true" ]] ) && includeScriptList+=( "os/distro"/getMost_special_veracrypt.sh )
 	
 	
+	
+	( [[ "$enUb_notLean" == "true" ]] || [[ "$enUb_getMinimal" == "true" ]] || [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] || [[ "$enUb_distro" == "true" ]] ) && includeScriptList+=( "os"/nixos.sh )
+	
+	
+	
 	[[ "$enUb_notLean" == "true" ]] && includeScriptList+=( "os/unix/systemd"/here_systemd.sh )
 	[[ "$enUb_notLean" == "true" ]] && includeScriptList+=( "os/unix/systemd"/hook_systemd.sh )
 	
@@ -7183,6 +7200,7 @@ _compile_bash_shortcuts() {
 	( [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "shortcuts/cloud/storage"/blackblaze/blackblaze.sh )
 	
 	
+	( [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "shortcuts/cloud/bridge"/croc/croc.sh )
 	( [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "shortcuts/cloud/bridge"/apacheLibcloud/apacheLibcloud.sh )
 	( [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "shortcuts/cloud/bridge"/nubo/nubo.sh )
 	( [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "shortcuts/cloud/bridge"/rclone/rclone.sh )
