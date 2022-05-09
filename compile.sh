@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1035238676'
+export ub_setScriptChecksum_contents='1773728196'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -1126,6 +1126,8 @@ then
 		
 		_at_userMSW_probeCmd_discoverResource-cygwinNative-ProgramFiles 'kate' 'Kate/bin' false > /dev/null 2>&1
 	fi
+	
+	export override_cygwin_vncviewer="true"
 fi
 
 # WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
@@ -5857,6 +5859,13 @@ _deps_chroot() {
 	export enUb_ChRoot="true"
 }
 
+_deps_bios() {
+	_deps_notLean
+	_deps_virt
+	_deps_virt_thick
+	export enUb_bios="true"
+}
+
 _deps_qemu() {
 	_deps_notLean
 	_deps_virt
@@ -6656,6 +6665,7 @@ _compile_bash_deps() {
 		#_deps_virt_thick
 		
 		#_deps_chroot
+		#_deps_bios
 		_deps_qemu
 		_deps_vbox
 		#_deps_docker
@@ -6744,6 +6754,7 @@ _compile_bash_deps() {
 		_deps_virt_thick
 		
 		_deps_chroot
+		_deps_bios
 		_deps_qemu
 		_deps_vbox
 		#_deps_docker
@@ -6832,6 +6843,7 @@ _compile_bash_deps() {
 		_deps_virt_thick
 		
 		_deps_chroot
+		_deps_bios
 		_deps_qemu
 		_deps_vbox
 		_deps_docker
@@ -7103,6 +7115,9 @@ _compile_bash_utilities_virtualization() {
 	[[ "$enUb_ChRoot" == "true" ]] && includeScriptList+=( "virtualization/chroot"/mountchrootuser.sh )
 	[[ "$enUb_ChRoot" == "true" ]] && includeScriptList+=( "virtualization/chroot"/userchroot.sh )
 	[[ "$enUb_ChRoot" == "true" ]] && includeScriptList+=( "virtualization/chroot"/dropchroot.sh )
+	
+	[[ "$enUb_bios" == "true" ]] && includeScriptList+=( "virtualization/bios"/createvm.sh )
+	[[ "$enUb_bios" == "true" ]] && includeScriptList+=( "virtualization/bios"/live.sh )
 	
 	[[ "$enUb_QEMU" == "true" ]] && includeScriptList+=( "virtualization/qemu"/qemu-raspi-raspi.sh )
 	[[ "$enUb_QEMU" == "true" ]] && includeScriptList+=( "virtualization/qemu"/qemu-x64-raspi.sh )
