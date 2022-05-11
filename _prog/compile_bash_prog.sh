@@ -143,6 +143,8 @@ _compile_bash_program_prog() {
 	includeScriptList+=( "flipKey/specialized/extremelyRedundant/"fsTemp.sh )
 	includeScriptList+=( "flipKey/specialized/extremelyRedundant/"extremelyRedundant.sh )
 	
+	includeScriptList+=( "flipKey/specialized/"simpleCrypt.sh )
+	
 	
 	includeScriptList+=( "flipKey/"token.sh )
 	

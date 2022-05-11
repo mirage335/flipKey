@@ -382,3 +382,27 @@ _disk_default() {
 	#_disk_experimental
 	_disc_bd25
 }
+
+
+
+
+
+_disk_simple() {
+	_disk_common
+	
+	export flipKey_headerKeySize=1800000000
+	export flipKey_containerSize=$(bc <<< "scale=0; ( ( "$(df --block-size=1 --output=avail "$scriptLocal" | tr -dc '0-9')" / 1.01 ) * 1 ) - 128000000 - $flipKey_headerKeySize")
+	
+	# Do not use entire disk - at least a few GB may be necessary for additional software installed to '/' , cache , etc .
+	export flipKey_containerSize=$(bc <<< "scale=0; ( ( ""$flipKey_containerSize - 12000000000")
+	
+	export flipKey_removable='false'
+	
+	export flipKey_filesystem="btrfs-mix"
+}
+
+_disk_simple_experimental() {
+	_disk_simple
+	
+	export flipKey_containerSize=12000000000
+}
