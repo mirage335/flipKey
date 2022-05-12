@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2811860145'
+export ub_setScriptChecksum_contents='3405722503'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15181,6 +15181,25 @@ _disk_simple_ops() {
 	#_purge()
 	#_generate()
 	#__zzGenerate()
+	
+	
+	_touch-flipKey-trivial_cygwin_procedure() {
+		_touch-flipKey-touch-random "$1"
+		[[ ! -e "$1" ]] && touch "$1"
+	}
+	_touch-flipKey() {
+		_touch-flipKey-touch-random "$1"
+		[[ ! -e "$1" ]] && touch "$1"
+	}
+	_touch-flipKey-trivial() {
+		_touch-flipKey-touch-random "$1"
+		[[ ! -e "$1" ]] && touch "$1"
+	}
+	_touch-flipKey-touch-loop() {
+		_touch-flipKey-touch-random "$1"
+		[[ ! -e "$1" ]] && touch "$1"
+	}
+	
 }
 
 _disk_simple() {
@@ -16515,7 +16534,7 @@ _extremelyRedundant_unmount() {
 
 
 
-# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of '/dev/mapper/veracrypt*' conflicts.
+# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of '/dev/mapper/veracrypt*' conflicts, and with more assurance of trim/discard available for nested use of flipKey , etc .
 
 # WARNING: Container filename will have '*.vc' extension, although not compatible with veracrypt !
 
@@ -16523,24 +16542,8 @@ _extremelyRedundant_unmount() {
 
 
 # ATTENTION: Override with 'ops.sh' , 'disk.sh' , or similar .
-#__create() {
-	#_generate
-	#_simpleCrypt_create
-#}
-#_zzCreate()
-
-#__grab() {
-	#_simpleCrypt_mount
-#}
-
-#__toss() {
-	#_simpleCrypt_unmount
-#}
-
-#_purge()
-#_generate()
-#__zzGenerate()
-
+# See 'flipKey_disk.sh' for '_disk_simple_ops' .
+#_disk_simple_ops()
 
 
 

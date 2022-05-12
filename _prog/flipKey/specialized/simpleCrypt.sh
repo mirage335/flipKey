@@ -1,5 +1,5 @@
 
-# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of '/dev/mapper/veracrypt*' conflicts.
+# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of '/dev/mapper/veracrypt*' conflicts, and with more assurance of trim/discard available for nested use of flipKey , etc .
 
 # WARNING: Container filename will have '*.vc' extension, although not compatible with veracrypt !
 
@@ -7,24 +7,8 @@
 
 
 # ATTENTION: Override with 'ops.sh' , 'disk.sh' , or similar .
-#__create() {
-	#_generate
-	#_simpleCrypt_create
-#}
-#_zzCreate()
-
-#__grab() {
-	#_simpleCrypt_mount
-#}
-
-#__toss() {
-	#_simpleCrypt_unmount
-#}
-
-#_purge()
-#_generate()
-#__zzGenerate()
-
+# See 'flipKey_disk.sh' for '_disk_simple_ops' .
+#_disk_simple_ops()
 
 
 
