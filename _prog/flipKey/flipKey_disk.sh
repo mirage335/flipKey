@@ -423,5 +423,7 @@ _disk_simple() {
 _disk_simple_small() {
 	_disk_simple
 	
-	export flipKey_containerSize=6000000000
+	export flipKey_headerKeySize=100000000
+	#export flipKey_containerSize=6000000000
+	export flipKey_containerSize=800000000
 }
