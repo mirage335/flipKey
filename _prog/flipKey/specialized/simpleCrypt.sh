@@ -39,7 +39,7 @@ _simpleCrypt_format() {
 	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M status=progress
 	#sync
 	
-	sudo -n mkfs.btrfs -f --checksum sha256 -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+	sudo -n mkfs.btrfs -f --checksum xxhash -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
 	currentExitStatus=$?
 	sync
 	
