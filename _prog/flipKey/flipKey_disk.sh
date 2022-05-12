@@ -420,7 +420,7 @@ _disk_simple() {
 	export flipKey_filesystem="btrfs-mix"
 }
 
-_disk_simple_experimental() {
+_disk_simple_small() {
 	_disk_simple
 	
 	export flipKey_containerSize=12000000000
