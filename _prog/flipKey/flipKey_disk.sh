@@ -434,6 +434,11 @@ _disk_simple() {
 	# Do not use entire disk - at least a few GB may be necessary for additional software installed to '/' , cache , etc .
 	export flipKey_containerSize=$(bc <<< "scale=0; ""$flipKey_containerSize - 12000000000")
 	
+	if bc <<< "$flipKey_containerSize < 800000000"
+	then
+		export flipKey_containerSize=800000000
+	fi
+	
 	export flipKey_removable='false'
 	
 	export flipKey_filesystem="btrfs-mix"
