@@ -409,18 +409,12 @@ _disk_simple_ops() {
 	_touch-flipKey-trivial_cygwin_procedure() {
 		_touch-flipKey-touch-random "$1"
 		[[ ! -e "$1" ]] && touch "$1"
-	}
-	_touch-flipKey() {
-		_touch-flipKey-touch-random "$1"
-		[[ ! -e "$1" ]] && touch "$1"
-	}
-	_touch-flipKey-trivial() {
-		_touch-flipKey-touch-random "$1"
-		[[ ! -e "$1" ]] && touch "$1"
+		[[ -e "$1" ]] && return 0
 	}
 	_touch-flipKey-touch-loop() {
 		_touch-flipKey-touch-random "$1"
 		[[ ! -e "$1" ]] && touch "$1"
+		[[ -e "$1" ]] && return 0
 	}
 	
 }

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2934861669'
+export ub_setScriptChecksum_contents='2186574624'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15186,18 +15186,12 @@ _disk_simple_ops() {
 	_touch-flipKey-trivial_cygwin_procedure() {
 		_touch-flipKey-touch-random "$1"
 		[[ ! -e "$1" ]] && touch "$1"
-	}
-	_touch-flipKey() {
-		_touch-flipKey-touch-random "$1"
-		[[ ! -e "$1" ]] && touch "$1"
-	}
-	_touch-flipKey-trivial() {
-		_touch-flipKey-touch-random "$1"
-		[[ ! -e "$1" ]] && touch "$1"
+		[[ -e "$1" ]] && return 0
 	}
 	_touch-flipKey-touch-loop() {
 		_touch-flipKey-touch-random "$1"
 		[[ ! -e "$1" ]] && touch "$1"
+		[[ -e "$1" ]] && return 0
 	}
 	
 }
