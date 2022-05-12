@@ -115,7 +115,7 @@ _simpleCrypt_mount_procedure() {
 	_disk_declare
 	_check_keyPartition
 	
-	_messagePlain_probe_cmd _touch-flipKey-trivial
+	#_messagePlain_probe_cmd _touch-flipKey-trivial
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: cryptsetup' && _stop 1
 	
@@ -135,12 +135,13 @@ _simpleCrypt_mount_procedure() {
 		sudo -n chmod 775 "$flipKey_mount"
 	fi
 	
-	_touch-flipKey-trivial
+	#_touch-flipKey-trivial
 	
 	[[ "$currentExitStatus" == "0" ]] && _messagePlain_good 'good: mount'
 	[[ "$currentExitStatus" != "0" ]] && _messagePlain_bad 'fail: mount'
 	
-	sleep 3
+	sleep 0.3
+	#sleep 3
 	
 	return "$currentExitStatus"
 }
@@ -168,7 +169,7 @@ _simpleCrypt_unmount_procedure() {
 	_disk_declare
 	#_check_keyPartition
 	
-	_messagePlain_probe_cmd _touch-flipKey-trivial
+	#_messagePlain_probe_cmd _touch-flipKey-trivial
 	
 	if ! sudo -n umount "$flipKey_mount"
 	then
@@ -181,7 +182,7 @@ _simpleCrypt_unmount_procedure() {
 		currentExitStatus=1
 	fi
 	
-	_touch-flipKey-trivial
+	#_touch-flipKey-trivial
 	
 	sudo -n chown "$USER":"$USER" "$flipKey_mount"
 	if ! chmod 500 "$flipKey_mount"
@@ -192,7 +193,8 @@ _simpleCrypt_unmount_procedure() {
 	[[ "$currentExitStatus" == "0" ]] && _messagePlain_good 'good: unmount'
 	[[ "$currentExitStatus" != "0" ]] && _messagePlain_bad 'fail: unmount'
 	
-	sleep 3
+	sleep 0.3
+	#sleep 3
 	
 	return "$currentExitStatus"
 }
