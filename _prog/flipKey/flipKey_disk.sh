@@ -385,7 +385,7 @@ _disk_default() {
 
 
 
-
+# WARNING: Strongly discouraged!
 _disk_simple_ops() {
 	__create() {
 		_generate

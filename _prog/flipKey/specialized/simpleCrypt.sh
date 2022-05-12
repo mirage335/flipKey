@@ -1,5 +1,7 @@
 
-# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of 'losetup' or '/dev/mapper/veracrypt*' conflicts.
+# WARNING: May be untested. Misses much of the compatibility and testing benefits of veracrypt backend. Only expected use is to encrypt '/', '/home/user', or similar directories with less risk of '/dev/mapper/veracrypt*' conflicts.
+
+# WARNING: Container filename will have '*.vc' extension, although not compatible with veracrypt !
 
 
 
