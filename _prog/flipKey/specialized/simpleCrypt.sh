@@ -51,7 +51,8 @@ _simpleCrypt_format() {
 	currentExitStatus=0
 	
 	# DANGER: Uncomment if '-allow-discards' is disabled.
-	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M oflag=direct conv=fdatasync status=progress
+	#oflag=direct conv=fdatasync
+	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M status=progress
 	#sync
 	
 	sudo -n mkfs.btrfs -f --checksum sha256 -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
@@ -72,8 +73,9 @@ _simpleCrypt_create() {
 	_token_mount ro
 	
 	
+	#oflag=direct conv=fdatasync
 	sudo -n rm -f "$flipKey_container"
-	dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") oflag=direct conv=fdatasync status=progress
+	dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
