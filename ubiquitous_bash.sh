@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2950971920'
+export ub_setScriptChecksum_contents='683502593'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15163,6 +15163,25 @@ _disk_default() {
 
 
 
+_disk_simple_ops() {
+	__create() {
+		_generate
+		_simpleCrypt_create
+	}
+	#_zzCreate()
+	
+	__grab() {
+		_simpleCrypt_mount
+	}
+	
+	__toss() {
+		_simpleCrypt_unmount
+	}
+	
+	#_purge()
+	#_generate()
+	#__zzGenerate()
+}
 
 _disk_simple() {
 	_disk_common
@@ -15171,7 +15190,7 @@ _disk_simple() {
 	export flipKey_containerSize=$(bc <<< "scale=0; ( ( "$(df --block-size=1 --output=avail "$scriptLocal" | tr -dc '0-9')" / 1.01 ) * 1 ) - 128000000 - $flipKey_headerKeySize")
 	
 	# Do not use entire disk - at least a few GB may be necessary for additional software installed to '/' , cache , etc .
-	export flipKey_containerSize=$(bc <<< "scale=0; ( ( ""$flipKey_containerSize - 12000000000")
+	export flipKey_containerSize=$(bc <<< "scale=0; ""$flipKey_containerSize - 12000000000")
 	
 	export flipKey_removable='false'
 	
@@ -16499,10 +16518,7 @@ _extremelyRedundant_unmount() {
 
 
 
-# ATTENTION: Override with 'ops.sh' .
-
-
-
+# ATTENTION: Override with 'ops.sh' , 'disk.sh' , or similar .
 #__create() {
 	#_generate
 	#_simpleCrypt_create
@@ -16514,7 +16530,7 @@ _extremelyRedundant_unmount() {
 #}
 
 #__toss() {
-	#_simpleCrypt_umount
+	#_simpleCrypt_unmount
 #}
 
 #_purge()
@@ -16528,24 +16544,27 @@ _simpleCrypt_cryptsetup() {
 	#echo -n $ubiquitousBashID | md5sum | head -c32 | md5sum | head -c32 | md5sum | head -c32 | head -c18
 	#71b362f4bea9a57dde
 	
-	[[ $(sudo -n cat "$flipKey_headerKeyFile" | head --bytes=48 | tail --bytes=48 | sudo -n cat "$flipKey_headerKeyFile" - | tail --bytes=+250 | tail --bytes=8192000 | wc -c | tr -dc '0-9') -lt "393015" ]] && _messagePlain_bad 'fail: size: key' && return 1
+	local flipKey_headerKeyFile_summary
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
+	echo "$flipKey_headerKeyFile_summary" | wc -c
 	
-	sudo -n cat "$flipKey_headerKeyFile" | sudo -n /sbin/cryptsetup --allow-discards --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create simpleCrypt_71b362f4bea9a57dde "$flipKey_container"
+	#sudo -n cat "$flipKey_headerKeyFile" | sudo -n /sbin/cryptsetup --allow-discards --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create simpleCrypt_71b362f4bea9a57dde "$flipKey_container"
+	echo "$flipKey_headerKeyFile_summary" | sudo -n /sbin/cryptsetup --allow-discards --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create simpleCrypt_71b362f4bea9a57dde "$flipKey_container"
 }
 
 _simpleCrypt_cryptsetup_remove() {
-	sync ; sleep 12
-	local currentIterations
-	[[ -e /dev/mapper/simpleCrypt_71b362f4bea9a57dde ]] && currentIterations=0 && while [[ "$currentIterations" -lt 3 ]] && ! sudo -n /sbin/cryptsetup remove simpleCrypt_71b362f4bea9a57dde ; do sleep 20 ; let currentIterations=currentIterations+1 ; done
+	sync ; sleep 1
 	
+	[[ -e /dev/mapper/simpleCrypt_71b362f4bea9a57dde ]] && sudo -n /sbin/cryptsetup remove simpleCrypt_71b362f4bea9a57dde
 }
 
 _simpleCrypt_format() {
 	local currentExitStatus
 	currentExitStatus=0
 	
-	sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M oflag=direct conv=fdatasync status=progress
-	sync
+	# DANGER: Uncomment if '-allow-discards' is disabled.
+	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M oflag=direct conv=fdatasync status=progress
+	#sync
 	
 	sudo -n mkfs.btrfs -f --checksum sha256 -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
 	currentExitStatus=$?
@@ -16564,6 +16583,10 @@ _simpleCrypt_create() {
 	
 	_token_mount ro
 	
+	
+	sudo -n rm -f "$flipKey_container"
+	dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") oflag=direct conv=fdatasync status=progress
+	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
 	
@@ -16611,16 +16634,10 @@ _simpleCrypt_mount_procedure() {
 	#commit=3
 	#autodefrag
 	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,autodefrag,compress-force,compress=zstd:1" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+	if ! sudo -n mount -o "commit=45,autodefrag,discard,compress-force,compress=zstd:1" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 	then
 		currentExitStatus=1
 	fi
-	# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
-	# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
-	#if ! sudo -n mount -o remount,"compress-force,compress=zlib:9" "$flipKey_mount"
-	#	then
-	#	currentExitStatus=1
-	#fi
 	
 	sudo -n chown "$USER":"$USER" "$flipKey_mount"
 	if ! chmod 770 "$flipKey_mount"
