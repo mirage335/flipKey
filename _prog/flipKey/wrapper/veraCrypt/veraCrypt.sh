@@ -562,7 +562,7 @@ _veracrypt_mount_procedure() {
 			# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 			#compress=zlib:9
 			#compress-force=zlib:9,
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -574,7 +574,7 @@ _veracrypt_mount_procedure() {
 			# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -588,7 +588,7 @@ _veracrypt_mount_procedure() {
 			# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -602,7 +602,7 @@ _veracrypt_mount_procedure() {
 			# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi

@@ -78,13 +78,13 @@ _extremelyRedundant_mount() {
 	#commit=3
 	#autodefrag
 	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,autodefrag,compress-force,compress=zlib:9" /dev/mapper/flipKey_"$flipKey_container_mult02_uuid" "$flipKey_mount"
+	if ! sudo -n mount -o "commit=45,autodefrag,compress-force,compress=zlib:9,notreelog" /dev/mapper/flipKey_"$flipKey_container_mult02_uuid" "$flipKey_mount"
 	then
 		currentExitStatus=1
 	fi
 	# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 	# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
-	#if ! sudo -n mount -o remount,"compress-force,compress=zlib:9" "$flipKey_mount"
+	#if ! sudo -n mount -o remount,"compress-force,compress=zlib:9,notreelog" "$flipKey_mount"
 	#	then
 	#	currentExitStatus=1
 	#fi

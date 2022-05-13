@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1951276157'
+export ub_setScriptChecksum_contents='974286925'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15787,7 +15787,7 @@ _veracrypt_mount_procedure() {
 			# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 			#compress=zlib:9
 			#compress-force=zlib:9,
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -15799,7 +15799,7 @@ _veracrypt_mount_procedure() {
 			# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -15813,7 +15813,7 @@ _veracrypt_mount_procedure() {
 			# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -15827,7 +15827,7 @@ _veracrypt_mount_procedure() {
 			# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
 			#compress=zlib:9
 			#compress-force=zlib:9
-			if ! sudo -n mount -o remount,"compress=zlib:9" "$flipKey_mount"
+			if ! sudo -n mount -o remount,"compress=zlib:9,notreelog" "$flipKey_mount"
 			then
 				currentExitStatus=1
 			fi
@@ -16467,13 +16467,13 @@ _extremelyRedundant_mount() {
 	#commit=3
 	#autodefrag
 	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,autodefrag,compress-force,compress=zlib:9" /dev/mapper/flipKey_"$flipKey_container_mult02_uuid" "$flipKey_mount"
+	if ! sudo -n mount -o "commit=45,autodefrag,compress-force,compress=zlib:9,notreelog" /dev/mapper/flipKey_"$flipKey_container_mult02_uuid" "$flipKey_mount"
 	then
 		currentExitStatus=1
 	fi
 	# Compression. May break some 'direct' writing to filesystem, but these only seem effectively used by large networked databases. Other applications seem to rely on a reasonable default write interval, which seems adequate.
 	# Redundancy is expected to imply storage is not solid-state, with emphasis on reliability, so compression will not meaningfully reduce transfer speed.
-	#if ! sudo -n mount -o remount,"compress-force,compress=zlib:9" "$flipKey_mount"
+	#if ! sudo -n mount -o remount,"compress-force,compress=zlib:9,notreelog" "$flipKey_mount"
 	#	then
 	#	currentExitStatus=1
 	#fi
@@ -16642,7 +16642,7 @@ _simpleCrypt_mount_procedure() {
 	#commit=3
 	#autodefrag
 	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,autodefrag,discard,compress=zstd:1" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+	if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 	then
 		currentExitStatus=1
 	fi
