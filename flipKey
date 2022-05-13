@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2186574624'
+export ub_setScriptChecksum_contents='2260147020'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16551,7 +16551,7 @@ _simpleCrypt_cryptsetup() {
 	#71b362f4bea9a57dde
 	
 	local flipKey_headerKeyFile_summary
-	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
 	echo "$flipKey_headerKeyFile_summary" | wc -c
 	
 	#sudo -n cat "$flipKey_headerKeyFile" | sudo -n /sbin/cryptsetup --allow-discards --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create simpleCrypt_71b362f4bea9a57dde "$flipKey_container"

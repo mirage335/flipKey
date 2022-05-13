@@ -17,7 +17,7 @@ _simpleCrypt_cryptsetup() {
 	#71b362f4bea9a57dde
 	
 	local flipKey_headerKeyFile_summary
-	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile")
+	flipKey_headerKeyFile_summary=$(_mix_keyfile "$flipKey_headerKeyFile" "summary")
 	echo "$flipKey_headerKeyFile_summary" | wc -c
 	
 	#sudo -n cat "$flipKey_headerKeyFile" | sudo -n /sbin/cryptsetup --allow-discards --hash whirlpool --key-size=512 --cipher aes-xts-plain64 --key-file=- create simpleCrypt_71b362f4bea9a57dde "$flipKey_container"
