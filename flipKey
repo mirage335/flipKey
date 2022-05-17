@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3018961109'
+export ub_setScriptChecksum_contents='73149308'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -15245,7 +15245,7 @@ _disk_simple() {
 	export flipKey_containerSize=$(bc <<< "scale=0; ( ( "$(df --block-size=1 --output=avail "$scriptLocal" | tr -dc '0-9')" / 1.01 ) * 1 ) - 128000000 - $flipKey_headerKeySize")
 	
 	# Do not use entire disk - at least a few GB may be necessary for additional software installed to '/' , cache , etc .
-	export flipKey_containerSize=$(bc <<< "scale=0; ""$flipKey_containerSize - 12000000000")
+	export flipKey_containerSize=$(bc <<< "scale=0; ""$flipKey_containerSize - 14000000000")
 	
 	if [[ $(bc <<< "$flipKey_containerSize < 800000000" | tr -dc '0-9') == "1" ]]
 	then
@@ -16635,7 +16635,8 @@ _simpleCrypt_create() {
 	
 	#oflag=direct conv=fdatasync
 	sudo -n rm -f "$flipKey_container"
-	dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1

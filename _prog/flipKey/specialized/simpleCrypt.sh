@@ -59,7 +59,8 @@ _simpleCrypt_create() {
 	
 	#oflag=direct conv=fdatasync
 	sudo -n rm -f "$flipKey_container"
-	dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
