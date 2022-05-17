@@ -25,12 +25,16 @@ _simpleCrypt_cryptsetup() {
 }
 
 _simpleCrypt_cryptsetup_remove() {
+	_mustGetSudo
+	
 	sync ; sleep 1
 	
 	[[ -e /dev/mapper/simpleCrypt_71b362f4bea9a57dde ]] && sudo -n /sbin/cryptsetup remove simpleCrypt_71b362f4bea9a57dde
 }
 
 _simpleCrypt_format() {
+	_mustGetSudo
+	
 	local currentExitStatus
 	currentExitStatus=0
 	
@@ -49,6 +53,8 @@ _simpleCrypt_format() {
 
 
 _simpleCrypt_create() {
+	_mustGetSudo
+	
 	_mix_keyfile_vector
 	
 	_disk_declare
@@ -60,7 +66,10 @@ _simpleCrypt_create() {
 	#oflag=direct conv=fdatasync
 	sudo -n rm -f "$flipKey_container"
 	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
-	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
+	#sudo -n ... tee ...
+	# | tee "$flipKey_container" > /dev/null
+	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > /dev/null
+	
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
@@ -78,6 +87,8 @@ _simpleCrypt_create() {
 
 
 _simpleCrypt_mount() {
+	_mustGetSudo
+	
 	local currentExitStatus
 	_mix_keyfile_vector
 	
@@ -132,6 +143,8 @@ _simpleCrypt_mount_procedure() {
 }
 
 _simpleCrypt_unmount() {
+	_mustGetSudo
+	
 	local currentExitStatus
 	_mix_keyfile_vector
 	
