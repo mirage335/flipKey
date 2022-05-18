@@ -68,7 +68,7 @@ _simpleCrypt_create() {
 	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
 	#sudo -n ... tee ...
 	# | tee "$flipKey_container" > /dev/null
-	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > /dev/null
+	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
 	
 	sync
 	
