@@ -32,6 +32,17 @@ _simpleCrypt_cryptsetup_remove() {
 	[[ -e /dev/mapper/simpleCrypt_71b362f4bea9a57dde ]] && sudo -n /sbin/cryptsetup remove simpleCrypt_71b362f4bea9a57dde
 }
 
+# WARNING: Exit status important.
+_simpleCrypt_mkfs() {
+	if [[ -e /simpleCrypt_ext4 ]]
+	then
+		sudo -n mkfs.ext4 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+		return
+	else
+		sudo -n mkfs.btrfs -f --checksum xxhash -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+		return
+	fi
+}
 _simpleCrypt_format() {
 	_mustGetSudo
 	
@@ -43,7 +54,7 @@ _simpleCrypt_format() {
 	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M status=progress
 	#sync
 	
-	sudo -n mkfs.btrfs -f --checksum xxhash -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+	_simpleCrypt_mkfs "$@"
 	currentExitStatus=$?
 	sync
 	
@@ -62,13 +73,17 @@ _simpleCrypt_create() {
 	
 	_token_mount ro
 	
+	# DANGER: Uncomment, instead of allocated or sparse file, if '-allow-discards' is disabled.
+	##oflag=direct conv=fdatasync
+	#sudo -n rm -f "$flipKey_container"
+	##dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	##sudo -n ... tee ...
+	## | tee "$flipKey_container" > /dev/null
+	#_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
 	
-	#oflag=direct conv=fdatasync
-	sudo -n rm -f "$flipKey_container"
-	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
-	#sudo -n ... tee ...
-	# | tee "$flipKey_container" > /dev/null
-	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
+	# https://serverfault.com/questions/696554/creating-a-grow-on-demand-encrypted-volume-with-luks
+	dd of="$flipKey_container" bs=1M count=0 seek=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") status=progress
+	
 	
 	sync
 	
@@ -117,13 +132,26 @@ _simpleCrypt_mount_procedure() {
 	
 	! mkdir -p "$flipKey_mount" && sudo -n mkdir -p "$flipKey_mount"
 	
-	#commit=3
-	#autodefrag
-	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+	
+	if [[ -e /simpleCrypt_ext4 ]]
 	then
-		currentExitStatus=1
+		if ! sudo -n mount -o "defaults,errors=remount-ro" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		then
+			currentExitStatus=1
+			return
+		fi
+	else
+		# https://www.reddit.com/r/btrfs/comments/tnyc53/so_autodefrag_really_increases_ssd_wear/
+		#commit=3
+		#autodefrag
+		#compress-force,compress=zlib:9
+		if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		then
+			currentExitStatus=1
+			return
+		fi
 	fi
+	
 	
 	sudo -n chown "$USER":"$USER" "$flipKey_mount"
 	if ! chmod 770 "$flipKey_mount"

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1328189165'
+export ub_setScriptChecksum_contents='4075461188'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -7381,6 +7381,13 @@ fi
 # Near-realtime priority may be acceptable, due to reliability of relevant Ubiquitous Bash functions.
 # WARNING: Do NOT prioritize highly enough to interfere with embedded hard realtime processes.
 
+# Not known or expected to cause significant issues. Not known to affect 'ubiquitous_bash' bash scripts, may affect the separate python 'lean.py' script.
+if [[ "\$USER" == "" ]]
+then
+	[[ "\$UID" == "0" ]] && export USER="root"
+	[[ "\$USER" == "" ]] && export USER=\$(id -u -n 2>/dev/null)
+fi
+
 CZXWXcRMTo8EmM8i4d
 
 
@@ -14006,6 +14013,15 @@ _package_ubcp_copy_copy() {
 	return 0
 }
 
+# ATTENTION: Override with 'installation_prog.sh' or similar.
+_package_ubcp_copy_prog() {
+	false
+	
+	cd "$outerPWD"
+	return 1
+	_stop 1
+}
+
 _package_ubcp_copy() {
 	mkdir -p "$safeTmp"/package/_local
 	
@@ -14044,6 +14060,12 @@ _package_ubcp_copy() {
 	then
 		_package_ubcp_copy_copy "$scriptLib"/ubiquitous_bash/ubcp "$safeTmp"/package/_local/
 		rm -f "$safeTmp"/package/_local/ubcp/package_ubcp-cygwinOnly.tar.gz
+		return 0
+	fi
+	
+	# ATTENTION: Override with 'installation_prog.sh' or similar.
+	if _package_ubcp_copy_prog
+	then
 		return 0
 	fi
 	
@@ -16608,6 +16630,17 @@ _simpleCrypt_cryptsetup_remove() {
 	[[ -e /dev/mapper/simpleCrypt_71b362f4bea9a57dde ]] && sudo -n /sbin/cryptsetup remove simpleCrypt_71b362f4bea9a57dde
 }
 
+# WARNING: Exit status important.
+_simpleCrypt_mkfs() {
+	if [[ -e /simpleCrypt_ext4 ]]
+	then
+		sudo -n mkfs.ext4 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+		return
+	else
+		sudo -n mkfs.btrfs -f --checksum xxhash -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+		return
+	fi
+}
 _simpleCrypt_format() {
 	_mustGetSudo
 	
@@ -16619,7 +16652,7 @@ _simpleCrypt_format() {
 	#sudo -n dd if=/dev/urandom of=/dev/mapper/simpleCrypt_71b362f4bea9a57dde bs=2M status=progress
 	#sync
 	
-	sudo -n mkfs.btrfs -f --checksum xxhash -M -d single /dev/mapper/simpleCrypt_71b362f4bea9a57dde
+	_simpleCrypt_mkfs "$@"
 	currentExitStatus=$?
 	sync
 	
@@ -16638,13 +16671,17 @@ _simpleCrypt_create() {
 	
 	_token_mount ro
 	
+	# DANGER: Uncomment, instead of allocated or sparse file, if '-allow-discards' is disabled.
+	##oflag=direct conv=fdatasync
+	#sudo -n rm -f "$flipKey_container"
+	##dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
+	##sudo -n ... tee ...
+	## | tee "$flipKey_container" > /dev/null
+	#_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
 	
-	#oflag=direct conv=fdatasync
-	sudo -n rm -f "$flipKey_container"
-	#dd if=/dev/urandom of="$flipKey_container" bs=1M count=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576")  status=progress
-	#sudo -n ... tee ...
-	# | tee "$flipKey_container" > /dev/null
-	_openssl_rand-flipKey | head -c "$flipKey_containerSize" | pv > "$flipKey_container"
+	# https://serverfault.com/questions/696554/creating-a-grow-on-demand-encrypted-volume-with-luks
+	dd of="$flipKey_container" bs=1M count=0 seek=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") status=progress
+	
 	
 	sync
 	
@@ -16693,13 +16730,26 @@ _simpleCrypt_mount_procedure() {
 	
 	! mkdir -p "$flipKey_mount" && sudo -n mkdir -p "$flipKey_mount"
 	
-	#commit=3
-	#autodefrag
-	#compress-force,compress=zlib:9
-	if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+	
+	if [[ -e /simpleCrypt_ext4 ]]
 	then
-		currentExitStatus=1
+		if ! sudo -n mount -o "defaults,errors=remount-ro" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		then
+			currentExitStatus=1
+			return
+		fi
+	else
+		# https://www.reddit.com/r/btrfs/comments/tnyc53/so_autodefrag_really_increases_ssd_wear/
+		#commit=3
+		#autodefrag
+		#compress-force,compress=zlib:9
+		if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		then
+			currentExitStatus=1
+			return
+		fi
 	fi
+	
 	
 	sudo -n chown "$USER":"$USER" "$flipKey_mount"
 	if ! chmod 770 "$flipKey_mount"
@@ -18365,8 +18415,10 @@ import re
 #\033[0;35;47mpython-%d\033[0m
 #return "\033[92mIn [%d]:\033[0m " % (self.line)
 #return ">>> "
-#return "\033[1;94m|\033[91m#:\033[1;93m%s\033[1;92m@%s\033[1;94m)-%s(\033[1;95m\033[0;35;47mpython-%s\033[0m\033[1;94m)\033[1;96m|\n\033[1;94m|\033[1;97m[%s]\n\033[1;94m|\033[1;96m%d\033[1;94m) \033[1;96m>\033[0m " % (os.environ['USER'], socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
-#return "\033[1;94m|\033[91m#:\033[1;93m%s\033[1;92m@%s\033[1;94m)-%s(\033[1;95m\033[0;35;47mpython-%s\033[0m\033[1;94m)\033[1;96m|\n\033[1;94m|\033[1;97m[%s]\n\033[1;94m|%d\033[1;94m) \033[1;96m>\033[0m " % (os.environ['USER'], socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
+#return "\033[1;94m|\033[91m#:\033[1;93m%s\033[1;92m@%s\033[1;94m)-%s(\033[1;95m\033[0;35;47mpython-%s\033[0m\033[1;94m)\033[1;96m|\n\033[1;94m|\033[1;97m[%s]\n\033[1;94m|\033[1;96m%d\033[1;94m) \033[1;96m>\033[0m " % (os.getenv('USER','root'), socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
+#return "\033[1;94m|\033[91m#:\033[1;93m%s\033[1;92m@%s\033[1;94m)-%s(\033[1;95m\033[0;35;47mpython-%s\033[0m\033[1;94m)\033[1;96m|\n\033[1;94m|\033[1;97m[%s]\n\033[1;94m|%d\033[1;94m) \033[1;96m>\033[0m " % (os.getenv('USER','root'), socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
+#os.environ['USER']
+#os.getenv('USER','root')
 class ubPythonPS1(object):
 	def __init__(self):
 		self.line = 0
@@ -18374,9 +18426,9 @@ class ubPythonPS1(object):
 	def __str__(self):
 		self.line += 1
 		if self.line == 1:
-			return "\x01\033[1;94m\x02|\x01\033[91m\x02#:\x01\033[1;93m\x02%s\x01\033[1;92m\x02@%s\x01\033[1;94m\x02)-%s(\x01\033[1;95m\x02\x01\033[0;35;47m\x02python-%s\x01\033[0m\x02\x01\033[1;94m\x02)\x01\033[1;96m\x02|\n\x01\033[1;94m\x02|\x01\033[1;97m\x02[%s]\n\x01\033[1;94m\x02|\x01\033[1;96m\x02%d\x01\033[1;94m\x02) \x01\033[1;96m\x02>\x01\033[0m\x02 " % (os.environ['USER'], socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
+			return "\x01\033[1;94m\x02|\x01\033[91m\x02#:\x01\033[1;93m\x02%s\x01\033[1;92m\x02@%s\x01\033[1;94m\x02)-%s(\x01\033[1;95m\x02\x01\033[0;35;47m\x02python-%s\x01\033[0m\x02\x01\033[1;94m\x02)\x01\033[1;96m\x02|\n\x01\033[1;94m\x02|\x01\033[1;97m\x02[%s]\n\x01\033[1;94m\x02|\x01\033[1;96m\x02%d\x01\033[1;94m\x02) \x01\033[1;96m\x02>\x01\033[0m\x02 " % (os.getenv('USER','root'), socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
 		else:
-			return "\x01\033[1;94m\x02|\x01\033[91m\x02#:\x01\033[1;93m\x02%s\x01\033[1;92m\x02@%s\x01\033[1;94m\x02)-%s(\x01\033[1;95m\x02\x01\033[0;35;47m\x02python-%s\x01\033[0m\x02\x01\033[1;94m\x02)\x01\033[1;96m\x02|\n\x01\033[1;94m\x02|\x01\033[1;97m\x02[%s]\n\x01\033[1;94m\x02|%d\x01\033[1;94m\x02) \x01\033[1;96m\x02>\x01\033[0m\x02 " % (os.environ['USER'], socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
+			return "\x01\033[1;94m\x02|\x01\033[91m\x02#:\x01\033[1;93m\x02%s\x01\033[1;92m\x02@%s\x01\033[1;94m\x02)-%s(\x01\033[1;95m\x02\x01\033[0;35;47m\x02python-%s\x01\033[0m\x02\x01\033[1;94m\x02)\x01\033[1;96m\x02|\n\x01\033[1;94m\x02|\x01\033[1;97m\x02[%s]\n\x01\033[1;94m\x02|%d\x01\033[1;94m\x02) \x01\033[1;96m\x02>\x01\033[0m\x02 " % (os.getenv('USER','root'), socket.gethostname(), os.environ.get('prompt_cloudNetName', ''), hex(sys.hexversion), re.sub('^%s' % os.environ['HOME'], '~', os.path.expanduser(os.getcwd()) ), self.line)
 
 sys.ps1 = ubPythonPS1()
 sys.ps2 = "\x01\033[0;96m\x02|...\x01\033[0m\x02 "
