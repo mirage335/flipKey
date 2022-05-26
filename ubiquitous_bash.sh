@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='4075461188'
+export ub_setScriptChecksum_contents='2113409502'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16671,6 +16671,9 @@ _simpleCrypt_create() {
 	
 	_token_mount ro
 	
+	
+	sudo -n fstrim "$scriptAbsoluteFolder"
+	
 	# DANGER: Uncomment, instead of allocated or sparse file, if '-allow-discards' is disabled.
 	##oflag=direct conv=fdatasync
 	#sudo -n rm -f "$flipKey_container"
@@ -16683,6 +16686,7 @@ _simpleCrypt_create() {
 	dd of="$flipKey_container" bs=1M count=0 seek=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") status=progress
 	
 	
+	sudo -n fstrim "$scriptAbsoluteFolder"
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
@@ -16733,7 +16737,7 @@ _simpleCrypt_mount_procedure() {
 	
 	if [[ -e /simpleCrypt_ext4 ]]
 	then
-		if ! sudo -n mount -o "defaults,errors=remount-ro" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		if ! sudo -n mount -o "defaults,errors=remount-ro,discard" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 		then
 			currentExitStatus=1
 			return

@@ -73,6 +73,9 @@ _simpleCrypt_create() {
 	
 	_token_mount ro
 	
+	
+	sudo -n fstrim "$scriptAbsoluteFolder"
+	
 	# DANGER: Uncomment, instead of allocated or sparse file, if '-allow-discards' is disabled.
 	##oflag=direct conv=fdatasync
 	#sudo -n rm -f "$flipKey_container"
@@ -85,6 +88,7 @@ _simpleCrypt_create() {
 	dd of="$flipKey_container" bs=1M count=0 seek=$(bc <<< "scale=0; ""$flipKey_containerSize / 1048576") status=progress
 	
 	
+	sudo -n fstrim "$scriptAbsoluteFolder"
 	sync
 	
 	! _simpleCrypt_cryptsetup && _messagePlain_bad 'fail: create: cryptsetup' && _stop 1
@@ -135,7 +139,7 @@ _simpleCrypt_mount_procedure() {
 	
 	if [[ -e /simpleCrypt_ext4 ]]
 	then
-		if ! sudo -n mount -o "defaults,errors=remount-ro" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		if ! sudo -n mount -o "defaults,errors=remount-ro,discard" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 		then
 			currentExitStatus=1
 			return
