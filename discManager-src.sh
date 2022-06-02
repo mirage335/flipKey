@@ -3488,8 +3488,84 @@ EOF
 
 
 
+_extremelyRedundant_newPartition_automatic-mo-keyPartition-containerPartition() {
+	local currentDrive
+	currentDrive=$( _find_moDrive )
+	_check_moDrive
+	
+	_desilver_mo_partitionTable
+	
+	
+	sudo -n sgdisk "$currentDrive" --zap-all > /dev/null 2>&1
+	sudo -n sgdisk "$currentDrive" --clear > /dev/null 2>&1
+	sudo -n sgdisk "$currentDrive" --zap-all
+	sudo -n sgdisk "$currentDrive" --clear
+	#sudo -n parted --script "$currentDrive" 'mklabel gpt'
+	echo
+	echo
+	sync
+	sleep 15
+	
+	export expectedSECTOR=$(sudo -n sgdisk "$currentDrive" --print | grep -i 'Sector size' | grep -i 'logical' | tr -dc '0-9/' | sed 's/^\///' | cut -f1 -d\/)
+	if [[ "$expectedSECTOR" != 2048 ]] && [[ "$expectedSECTOR" != 512 ]] && [[ "$expectedSECTOR" != 1024 ]] && [[ "$expectedSECTOR" != 4096 ]]
+	then
+		echo 'fail: unrecognized sector size: '"$expectedSECTOR" && exit 1
+		#export expectedSECTOR="2048"
+	fi
+	#[[ "$currentDiscType" == "_disc_mo640"* ]] && export expectedSECTOR="2048" # _mo640 discs are *always* 2048b/sector, and this standardization greatly simplifies recovery
+	
+	
+	local currentDrive_size
+	currentDrive_size=$(sudo -n blockdev --getsize64 "$currentDrive" | tr -dc '0-9')
+	[[ "$currentDrive_size" == "" ]] && return 1
+	
+	local desiredMebibytes
+	desiredMebibytes=$(bc <<< " ( $currentDrive_size / 1048576 ) - 28 - 1 - 1 ")
+	
+	_extremelyRedundant_sectorPosition_reset
+	echo $current_nonexistent_boundary
+	sync
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
+	
+	_extremelyRedundant_newPartition 28 MiB "" software
+	#sudo -n sgdisk "$currentDrive" --typecode=0:8300
+	#sudo -n sgdisk "$currentDrive" --typecode=1:8300
+	echo
+	
+	_extremelyRedundant_newPartition 384 KiB 1
+	
+	_extremelyRedundant_newPartition "$desiredMebibytes" MiB
+	
+	sync
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
+	echo 'list: sgdisk'
+	sudo -n sgdisk "$currentDrive" --print
+	sudo -n sgdisk "$currentDrive" --verify
+	echo
+	echo
+	
+	sleep 15
+	local currentIteration
+	currentIteration=0
+	while [[ "$currentIteration" -lt 6 ]] && ( ! [[ -e "$currentDrive"-part1 ]] || ! [[ -e "$currentDrive"-part2 ]] || ! [[ -e "$currentDrive"-part3 ]] )
+	do
+		echo 'wait: partitions: iteration: '"$currentIteration"
+		sync
+		sudo -n partprobe
+		sudo -n udevadm trigger ; sync
+		sleep 15
+		let currentIteration=currentIteration+1
+	done
+	
+	return 0
+}
 
 
+# OBSOLETE. See '_extremelyRedundant_newPartition_automatic-mo-keyPartition-containerPartition' .
 _fdisk_automatic-mo-keyPartition-containerPartition() {
 	local currentDrive
 	currentDrive=$( _find_moDrive )
@@ -3568,7 +3644,8 @@ EOF
 	_fdisk_wait "$currentDrive"
 }
 _fdisk_automatic-mo-keyPartition() {
-	_fdisk_automatic-mo-keyPartition-containerPartition "$@"
+	#_fdisk_automatic-mo-keyPartition-containerPartition "$@"
+	_extremelyRedundant_newPartition_automatic-mo-keyPartition-containerPartition "$@"
 }
 
 _fdisk_automatic-mo() {
