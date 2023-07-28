@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1056036902'
+export ub_setScriptChecksum_contents='2265425092'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -272,6 +272,21 @@ then
 fi
 
 
+# ATTENTION: Highly irregular. Workaround due to gsch2pcb installed by nix package manager not searching for installed footprints.
+if [[ "$NIX_PROFILES" != "" ]]
+then
+	if [[ -e "$HOME"/.nix-profile/bin/gsch2pcb ]] && [[ -e /usr/local/share/pcb/newlib ]] && [[ -e /usr/local/lib/pcb_lib ]]
+	then
+		gsch2pcb() {
+			"$HOME"/.nix-profile/bin/gsch2pcb --elements-dir /usr/local/share/pcb/newlib --elements-dir /usr/local/lib/pcb_lib "$@"
+		}
+	elif [[ -e /usr/share/pcb/pcblib-newlib ]]
+	then
+		gsch2pcb() {
+			"$HOME"/.nix-profile/bin/gsch2pcb --elements-dir /usr/share/pcb/pcblib-newlib "$@"
+		}
+	fi
+fi
 
 
 # Only production use is Inter-Process Communication (IPC) loops which may be theoretically impossible to make fully deterministic under Operating Systems which do not have hard-real-time kernels and/or may serve an unlimited number of processes.
@@ -1091,6 +1106,11 @@ then
 	then
 		export cygwinOverride_measureDateA=$(date +%s%N | cut -b1-13)
 		export ub_setScriptChecksum_contents_cygwinOverride="$ub_setScriptChecksum_contents"
+		
+		
+		_discoverResource-cygwinNative-ProgramFiles 'ykman' 'Yubico/YubiKey Manager' false
+		
+		
 		
 		_discoverResource-cygwinNative-ProgramFiles 'nmap' 'Nmap' false
 		
@@ -7020,6 +7040,7 @@ _compile_bash_utilities() {
 	[[ "$enUb_proxy" == "true" ]] && includeScriptList+=( "generic/net/proxy/vnc"/vnc_vncserver_operations.sh )
 	[[ "$enUb_proxy" == "true" ]] && includeScriptList+=( "generic/net/proxy/vnc"/vnc_vncviewer_operations.sh )
 	[[ "$enUb_proxy" == "true" ]] && includeScriptList+=( "generic/net/proxy/vnc"/vnc_x11vnc_operations.sh )
+	( [[ "$enUb_proxy" == "true" ]] || [[ "$enUb_cloud" == "true" ]] ) && includeScriptList+=( "generic/net/proxy/vnc"/vnchost.sh )
 	
 	[[ "$enUb_proxy" == "true" ]] && includeScriptList+=( "generic/net/proxy/proxyrouter"/here_proxyrouter.sh )
 	[[ "$enUb_proxy" == "true" ]] && includeScriptList+=( "generic/net/proxy/proxyrouter"/proxyrouter.sh )
@@ -7713,14 +7734,22 @@ _compile_bash() {
 		includeScriptList+=( "structure"/localenv_prog.sh )
 		
 		
-		if [[ "$1" == "rotten_test" ]]
+		if [[ "$1" == "rotten_test" ]] || [[ "$1" == "rotten_test"* ]]
 		then
 			includeScriptList+=( "structure"/installation.sh )
 			includeScriptList+=( "structure"/installation_prog.sh )
 		fi
 		
-		#includeScriptList+=( "structure"/program.sh )
-		
+		if [[ "$1" == "rotten_test-extendedInterface" ]] || [[ "$1" == "rotten"*"-extendedInterface"* ]] || [[ "$1" == "rotten_test-"*"-MSW" ]] || [[ "$1" == "rotten_test-"*"-MSW"* ]]
+		then
+			# ATTENTION: May split anchor functions to 'setupUbiquitous-anchor.sh' .
+			includeScriptList+=( "shortcuts"/setupUbiquitous.sh )
+			#_compile_bash_shortcuts_setup
+			
+			includeScriptList+=( "structure"/program.sh )
+			_compile_bash_program
+			_compile_bash_program_prog
+		fi
 		
 		
 		#####Hardcoded

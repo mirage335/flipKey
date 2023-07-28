@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3305059852'
+export ub_setScriptChecksum_contents='2867471745'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -272,6 +272,21 @@ then
 fi
 
 
+# ATTENTION: Highly irregular. Workaround due to gsch2pcb installed by nix package manager not searching for installed footprints.
+if [[ "$NIX_PROFILES" != "" ]]
+then
+	if [[ -e "$HOME"/.nix-profile/bin/gsch2pcb ]] && [[ -e /usr/local/share/pcb/newlib ]] && [[ -e /usr/local/lib/pcb_lib ]]
+	then
+		gsch2pcb() {
+			"$HOME"/.nix-profile/bin/gsch2pcb --elements-dir /usr/local/share/pcb/newlib --elements-dir /usr/local/lib/pcb_lib "$@"
+		}
+	elif [[ -e /usr/share/pcb/pcblib-newlib ]]
+	then
+		gsch2pcb() {
+			"$HOME"/.nix-profile/bin/gsch2pcb --elements-dir /usr/share/pcb/pcblib-newlib "$@"
+		}
+	fi
+fi
 
 
 # Only production use is Inter-Process Communication (IPC) loops which may be theoretically impossible to make fully deterministic under Operating Systems which do not have hard-real-time kernels and/or may serve an unlimited number of processes.
@@ -1091,6 +1106,11 @@ then
 	then
 		export cygwinOverride_measureDateA=$(date +%s%N | cut -b1-13)
 		export ub_setScriptChecksum_contents_cygwinOverride="$ub_setScriptChecksum_contents"
+		
+		
+		_discoverResource-cygwinNative-ProgramFiles 'ykman' 'Yubico/YubiKey Manager' false
+		
+		
 		
 		_discoverResource-cygwinNative-ProgramFiles 'nmap' 'Nmap' false
 		
@@ -5253,11 +5273,17 @@ _qalculate_terse() {
 	
 	if [[ "$1" != "" ]]
 	then
-		_safeEcho_newline "$@" | qalc -t | grep -v '^>\ ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+		#_safeEcho_newline "$@" | qalc -t | grep -v '^>\ ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+		
+		# Preferred for Cygwin .
+		_safeEcho_newline "$@" | qalc -t | grep -v '^> ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
 		return
 	fi
 	
-	qalc -t "$@" | grep -v '^>\ ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+	#qalc -t "$@" | grep -v '^>\ ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+	
+	# Preferred for Cygwin .
+	qalc -t "$@" | grep -v '^> ' | grep -v '^$' | sed 's/^  //' | grep -v '^\s*$' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
 	return
 }
 
@@ -6417,13 +6443,13 @@ _gitBest_detect_github_procedure() {
 	then
 		_messagePlain_request 'performance: export current_gitBest_source_GitHub=$("'"$scriptAbsoluteLocation"'" _gitBest_detect_github_sequence | tail -n1)'
 		
-		if [[ -e "$HOME"/core ]]
+		if [[ -e "$HOME"/core ]] && [[ "$gitBestNoCore" != "true" ]]
 		then
 			export current_gitBest_source_GitHub="github_core"
 		fi
 		
 		local currentSSHoutput
-		if currentSSHoutput=$(ssh -o StrictHostKeyChecking=no -o Compression=yes -o ConnectionAttempts=3 -o ServerAliveInterval=6 -o ServerAliveCountMax=9 -o ConnectTimeout="$netTimeout" -o PubkeyAuthentication=yes -o PasswordAuthentication=no git@github.com 2>&1 ; true) && _safeEcho_newline "$currentSSHoutput" | grep 'successfully authenticated'
+		if ( [[ -e "$HOME"/.ssh/id_rsa ]] || [[ -e "$HOME"/.ssh/config ]] || ( [[ ! -e "$HOME"/.ssh/id_ed25519_sk ]] && [[ ! -e "$HOME"/.ssh/ecdsa-sk ]] ) ) && currentSSHoutput=$(ssh -o StrictHostKeyChecking=no -o Compression=yes -o ConnectionAttempts=3 -o ServerAliveInterval=6 -o ServerAliveCountMax=9 -o ConnectTimeout="$netTimeout" -o PubkeyAuthentication=yes -o PasswordAuthentication=no git@github.com 2>&1 ; true) && _safeEcho_newline "$currentSSHoutput" | grep 'successfully authenticated'
 		then
 			export current_gitBest_source_GitHub="github_ssh"
 			return
@@ -6497,7 +6523,14 @@ _gitBest_override_github-github_core() {
 	_gitBest_override_config_insteadOf-core zipTiePanel
 }
 _gitBest_override_github-github_https() {
-	git config --global url."https://github.com/".insteadOf git@github.com:
+	# && [[ "$1" == "push" ]]
+	if [[ "$INPUT_GITHUB_TOKEN" == "" ]]
+	then
+		git config --global url."https://github.com/".insteadOf git@github.com:
+	elif [[ "$INPUT_GITHUB_TOKEN" != "" ]]
+	then
+		git config --global url."https://""$INPUT_GITHUB_TOKEN""@github.com/".insteadOf git@github.com:
+	fi
 }
 
 
@@ -6514,7 +6547,7 @@ _gitBest_override_github() {
 	
 	if [[ "$current_gitBest_source_GitHub" == "github_https" ]]
 	then
-		_gitBest_override_github-github_https
+		_gitBest_override_github-github_https "$@"
 	fi
 	
 	if [[ "$current_gitBest_source_GitHub" == "github_ssh" ]]
@@ -6550,7 +6583,7 @@ _gitBest_sequence() {
 	_messagePlain_probe_var HOME
 	
 	
-	_gitBest_override_github
+	_gitBest_override_github "$@"
 	
 	if ! [[ -e "$HOME"/.gitconfig ]]
 	then
@@ -7987,6 +8020,8 @@ _anchor() {
 	
 	_anchor_configure
 	_anchor_configure "$scriptAbsoluteFolder"/_anchor.bat
+
+	_tryExec "_anchor_special"
 	
 	! [[ -e "$scriptAbsoluteFolder"/_anchor ]] && ! [[ -e "$scriptAbsoluteFolder"/_anchor.bat ]] && return 1
 	
