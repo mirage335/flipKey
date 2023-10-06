@@ -3370,8 +3370,9 @@ _gparted() {
 _fdisk_wait() {
 	sync
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	[[ -e "$1" ]] && sudo -n partprobe "$1"
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	if ! [[ -e "$1"-part1 ]]
 	then
@@ -3388,8 +3389,9 @@ _fdisk_wait() {
 	fi
 	while ! [[ -e "$1"-part1 ]] && _messagePlain_request 'request: may be necessary to remove and reinsert disk (sleep 45)' && sleep 45
 	do
-		sudo -n partprobe
-		sudo -n udevadm trigger ; sync
+		[[ -e "$1" ]] && sudo -n partprobe "$1"
+		#sudo -n partprobe > /dev/null 2>&1
+		#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 		
 		sync
 		sleep 1
@@ -3662,8 +3664,8 @@ _fdisk_automatic-mo() {
 	
 	_desilver_mo_partitionTable
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	# https://superuser.com/questions/332252/how-to-create-and-format-a-partition-using-a-bash-script
 	sudo -n fdisk "$currentDrive" << EOF
@@ -3679,8 +3681,8 @@ EOF
 	sync
 	_fdisk_wait "$currentDrive"
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	sudo -n fdisk "$currentDrive" << EOF
 p
@@ -3901,8 +3903,9 @@ _flipKey_unpackage() {
 	local currentDrive
 	currentDrive="$2"
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	sudo -n partprobe "$currentDrive"
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	mkdir -m 700 -p ./diskMount/user
 	sudo -n mount "$currentDrive"-part1 ./diskMount
@@ -4006,6 +4009,7 @@ _u_flipKey_unpackage() {
 _mo_flipKey_unpackage() {
 	local currentDrive
 	currentDrive=$( _find_moDrive )
+	sudo -n partprobe "$currentDrive"
 	_check_moDrive
 	
 	_flipKey_unpackage "$1" "$currentDrive"
@@ -4054,13 +4058,14 @@ _filesystem_mo() {
 	
 	local currentDrive
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	currentDrive=$( _find_moDrive )
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	sudo -n partprobe "$currentDrive"
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	_check_moDrive
 	
@@ -4074,8 +4079,9 @@ _filesystem_mo() {
 	
 	[[ "$1" == "ntfs" ]] && sudo -n mkfs."$1" -f "$currentDrive"-part1
 	
-	sudo -n partprobe
-	sudo -n udevadm trigger ; sync
+	sudo -n partprobe "$currentDrive"
+	#sudo -n partprobe > /dev/null 2>&1
+	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
 	sync
 	
