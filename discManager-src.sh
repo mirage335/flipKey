@@ -3887,6 +3887,9 @@ _flipKey_unpackage() {
 	local currentDrive
 	currentDrive="$2"
 	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	mkdir -m 700 -p ./diskMount/user
 	sudo -n mount "$currentDrive"-part1 ./diskMount
 	sudo -n chown "$USER":"$USER" ./diskMount
