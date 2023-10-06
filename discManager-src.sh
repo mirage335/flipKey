@@ -3369,6 +3369,10 @@ _gparted() {
 
 _fdisk_wait() {
 	sync
+	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	if ! [[ -e "$1"-part1 ]]
 	then
 		sleep 0.3
@@ -3384,6 +3388,9 @@ _fdisk_wait() {
 	fi
 	while ! [[ -e "$1"-part1 ]] && _messagePlain_request 'request: may be necessary to remove and reinsert disk (sleep 45)' && sleep 45
 	do
+		sudo -n partprobe
+		sudo -n udevadm trigger ; sync
+		
 		sync
 		sleep 1
 	done
@@ -3655,6 +3662,9 @@ _fdisk_automatic-mo() {
 	
 	_desilver_mo_partitionTable
 	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	# https://superuser.com/questions/332252/how-to-create-and-format-a-partition-using-a-bash-script
 	sudo -n fdisk "$currentDrive" << EOF
 o
@@ -3668,6 +3678,10 @@ EOF
 	
 	sync
 	_fdisk_wait "$currentDrive"
+	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	sudo -n fdisk "$currentDrive" << EOF
 p
 EOF
@@ -4039,7 +4053,15 @@ _filesystem_mo() {
 	functionEntryPWD="$PWD"
 	
 	local currentDrive
+	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	currentDrive=$( _find_moDrive )
+	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
+	
 	_check_moDrive
 	
 	# Optional '-cc' instead of '-c' .
@@ -4051,6 +4073,9 @@ _filesystem_mo() {
 	[[ "$1" == "btrfs" ]] && sudo -n mkfs."$1" -f "$currentDrive"-part1
 	
 	[[ "$1" == "ntfs" ]] && sudo -n mkfs."$1" -f "$currentDrive"-part1
+	
+	sudo -n partprobe
+	sudo -n udevadm trigger ; sync
 	
 	sync
 	
