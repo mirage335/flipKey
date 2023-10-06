@@ -3939,8 +3939,8 @@ _flipKey_unpackage() {
 	
 	cd "$functionEntryPWD"/diskMount/user/flipKey/_local
 	# WARNING: Compatibility only. Copy contents, but do NOT use directly.
-	sudo -n ln -s $(echo "/dev/disk/by-partuuid/$currentDrive_keyPartition" | tr -dc 'a-zA-Z0-9-/') ./c-h-flipKey
-	sudo -n ln -s $(echo "/dev/disk/by-partuuid/$currentDrive_containerPartition" | tr -dc 'a-zA-Z0-9-/') ./container.vc
+	[[ "$currentDrive" != "" ]] && [[ -e "$currentDrive"-part2 ]] && sudo -n ln -s $(echo "/dev/disk/by-partuuid/$currentDrive_keyPartition" | tr -dc 'a-zA-Z0-9-/') ./c-h-flipKey
+	[[ "$currentDrive" != "" ]] && [[ -e "$currentDrive"-part3 ]] && sudo -n ln -s $(echo "/dev/disk/by-partuuid/$currentDrive_containerPartition" | tr -dc 'a-zA-Z0-9-/') ./container.vc
 	cd "$functionEntryPWD"
 	
 	cd "$functionEntryPWD"/diskMount

@@ -191,6 +191,7 @@ _disc_mo230() {
 	
 	export flipKey_headerKeySize=1500000
 	export flipKey_containerSize=100000000
+	#export flipKey_containerSize=198000000
 	export flipKey_pattern_count=6
 }
 _disc_mo640() {
