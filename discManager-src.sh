@@ -4411,8 +4411,12 @@ _desilver_zip() {
 	_desilver_zip_keyPartition "$currentZipDrive" > /dev/null
 	sudo -n dd if=/dev/urandom of="$currentZipDrive" bs=2M oflag=direct conv=fdatasync status=progress
 	
+	sudo -n partprobe "$currentZipDrive"
+	
 	sudo -n sg_format --format "$currentZipDrive"
 	sync
+	
+	sudo -n partprobe "$currentZipDrive"
 	
 	sudo -n dd if=/dev/urandom of="$currentZipDrive" bs=2M oflag=direct conv=fdatasync status=progress
 	sync
@@ -4420,6 +4424,8 @@ _desilver_zip() {
 	# Although filling with zeros is probably not ideal and wastes considerable time, this may be used to generate a compressible disk image .
 	#sudo -n dd if=/dev/zero of="$currentZipDrive" bs=1M oflag=direct conv=fdatasync status=progress
 	_pattern_recovery_write "$currentZipDrive"
+	
+	sudo -n partprobe "$currentZipDrive"
 	sync
 }
 
@@ -4439,6 +4445,7 @@ _desilver_zip_partitionTable() {
 	sync
 	
 	_pattern_recovery_write "$currentZipDrive" 2
+	sudo -n partprobe "$currentZipDrive"
 	sync
 }
 
@@ -4488,6 +4495,8 @@ _desilver_u() {
 	_desilver_u_keyPartition "$currentDrive" > /dev/null
 	sudo -n dd if=/dev/urandom of="$currentDrive" bs=2M oflag=direct conv=fdatasync status=progress
 	
+	sudo -n partprobe "$currentDrive"
+	
 	#sudo -n sg_format --format "$currentDrive"
 	#sync
 	
@@ -4511,6 +4520,9 @@ _desilver_u() {
 	
 	# Microdrives may be especially likely to benefit from realignment recovery numbering.
 	_pattern_recovery_write "$currentDrive"
+	
+	sudo -n partprobe "$currentDrive"
+	sync
 }
 
 _desilver_u_partitionTable() {
@@ -4667,6 +4679,8 @@ _desilver_mo() {
 	sudo -n sg_format --format "$currentDrive"
 	sync
 	
+	sudo -n partprobe "$currentDrive"
+	
 	# DANGER: CAUTION: Do not reduce delay to less than thermal cooling of slowest and hottest plausible drive. Differences of >>30% read/write/heating/cooling time may exist between perfectly normal Magneto Optical drives.
 	# Theoretically 2700s should suffice (as this exceeds whole disc writing speed). Definitely, 5400s seems to prevent awkward failure of sustaining a writing speed of only 30kB/s for a while. At most, 7323s should suffice (three times worst known, expected, estimated, or averaged, whole disc writing speed).
 	#sleep 2700
@@ -4692,6 +4706,8 @@ _desilver_mo() {
 	# Although filling with zeros is probably not ideal and wastes considerable time, this may be used to generate a compressible disk image .
 	#sudo -n dd if=/dev/zero of="$currentDrive" bs=1M oflag=direct conv=fdatasync status=progress
 	_pattern_recovery_write "$currentDrive"
+	
+	sudo -n partprobe "$currentDrive"
 	sync
 }
 
@@ -4720,6 +4736,7 @@ _desilver_mo_partitionTable() {
 	sync
 	
 	_pattern_recovery_write "$currentDrive" 8
+	sudo -n partprobe "$currentDrive"
 	sync
 }
 
