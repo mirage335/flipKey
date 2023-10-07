@@ -4148,11 +4148,11 @@ _filesystem_zip() {
 	local currentZipDrive
 	currentZipDrive=$( _find_zipDrive )
 	_check_zipDrive
-	while ! sudo -n partprobe "$currentDrive"
+	while ! sudo -n partprobe "$currentZipDrive"
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! sudo -n dd if="$currentZipDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
