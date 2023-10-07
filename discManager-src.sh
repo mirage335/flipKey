@@ -2148,12 +2148,14 @@ _keyPartition_disk_generic() {
 	
 	
 	# ATTENTION: Software .
-	
-	while ( ! sudo -n partprobe "$flipKey_software_devFile" || ! sudo -n dd if="$flipKey_software_devFile" bs=1k count=1 > /dev/null )
+	while ! sudo -n partprobe "$flipKey_software_devFile"
 	do
 		sleep 1
 	done
-	
+	while ! sudo -n dd if="$flipKey_software_devFile"-part1 bs=1k count=1 > /dev/null 2>&1
+	do
+		sleep 1
+	done
 	sudo -n mkfs.ext4 -O 64bit,metadata_csum -cc -b -2048 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 -I 256 -F "$flipKey_software_devFile"
 	sync
 	
@@ -2894,7 +2896,11 @@ _extremelyRedundant_disc() {
 	
 	
 	# ATTENTION: Software .
-	while ( ! sudo -n partprobe "$flipKey_software_devFile" || ! sudo -n dd if="$flipKey_software_devFile" bs=1k count=1 > /dev/null )
+	while ! sudo -n partprobe "$flipKey_software_devFile"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$flipKey_software_devFile"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -3911,7 +3917,11 @@ _flipKey_unpackage() {
 	local currentDrive
 	currentDrive="$2"
 	
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4020,7 +4030,11 @@ _u_flipKey_unpackage() {
 _mo_flipKey_unpackage() {
 	local currentDrive
 	currentDrive=$( _find_moDrive )
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4046,7 +4060,11 @@ _filesystem_u() {
 	local currentDrive
 	currentDrive=$( _find_uDrive )
 	_check_uDrive
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4081,7 +4099,11 @@ _filesystem_mo() {
 	
 	currentDrive=$( _find_moDrive )
 	
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4100,7 +4122,11 @@ _filesystem_mo() {
 	
 	[[ "$1" == "ntfs" ]] && sudo -n mkfs."$1" -f "$currentDrive"-part1
 	
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4122,7 +4148,11 @@ _filesystem_zip() {
 	local currentZipDrive
 	currentZipDrive=$( _find_zipDrive )
 	_check_zipDrive
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentDrive"
+	do
+		sleep 1
+	done
+	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
 	do
 		sleep 1
 	done
@@ -4308,11 +4338,14 @@ _zip_token() {
 	local currentZipDrive
 	currentZipDrive=$( _find_zipDrive )
 	_check_zipDrive
-	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	while ! sudo -n partprobe "$currentZipDrive"
 	do
 		sleep 1
 	done
-	
+	while ! sudo -n dd if="$currentZipDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	do
+		sleep 1
+	done
 	sudo -n mkfs.ext2 -c -b -1024 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 -I 256 -F "$currentZipDrive"-part1
 	
 	_messagePlain_request 'request: blkid: consider UUID (ie. token id)'
