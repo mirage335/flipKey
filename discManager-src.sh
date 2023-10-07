@@ -2149,6 +2149,11 @@ _keyPartition_disk_generic() {
 	
 	# ATTENTION: Software .
 	
+	while ( ! sudo -n partprobe "$flipKey_software_devFile" || ! sudo -n dd if="$flipKey_software_devFile" bs=1k count=1 > /dev/null )
+	do
+		sleep 1
+	done
+	
 	sudo -n mkfs.ext4 -O 64bit,metadata_csum -cc -b -2048 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 -I 256 -F "$flipKey_software_devFile"
 	sync
 	
@@ -2889,7 +2894,10 @@ _extremelyRedundant_disc() {
 	
 	
 	# ATTENTION: Software .
-	
+	while ( ! sudo -n partprobe "$flipKey_software_devFile" || ! sudo -n dd if="$flipKey_software_devFile" bs=1k count=1 > /dev/null )
+	do
+		sleep 1
+	done
 	sudo -n mkfs.ext4 -O 64bit,metadata_csum -cc -b -2048 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 -I 256 -F "$flipKey_software_devFile"
 	sync
 	
@@ -3903,7 +3911,10 @@ _flipKey_unpackage() {
 	local currentDrive
 	currentDrive="$2"
 	
-	sudo -n partprobe "$currentDrive"
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	#sudo -n partprobe > /dev/null 2>&1
 	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
@@ -4009,7 +4020,10 @@ _u_flipKey_unpackage() {
 _mo_flipKey_unpackage() {
 	local currentDrive
 	currentDrive=$( _find_moDrive )
-	sudo -n partprobe "$currentDrive"
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	_check_moDrive
 	
 	_flipKey_unpackage "$1" "$currentDrive"
@@ -4032,6 +4046,10 @@ _filesystem_u() {
 	local currentDrive
 	currentDrive=$( _find_uDrive )
 	_check_uDrive
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	
 	# Optional '-cc' instead of '-c' .
 	# Read/write checking of disk for bad blocks may seem unnecessary. However, these filesystems will usually be small, intended for scripts or token storage (where corruption might cause more severe data loss).
@@ -4063,7 +4081,10 @@ _filesystem_mo() {
 	
 	currentDrive=$( _find_moDrive )
 	
-	sudo -n partprobe "$currentDrive"
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	#sudo -n partprobe > /dev/null 2>&1
 	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
@@ -4079,7 +4100,10 @@ _filesystem_mo() {
 	
 	[[ "$1" == "ntfs" ]] && sudo -n mkfs."$1" -f "$currentDrive"-part1
 	
-	sudo -n partprobe "$currentDrive"
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	#sudo -n partprobe > /dev/null 2>&1
 	#sudo -n udevadm trigger > /dev/null 2>&1 ; sync
 	
@@ -4098,6 +4122,10 @@ _filesystem_zip() {
 	local currentZipDrive
 	currentZipDrive=$( _find_zipDrive )
 	_check_zipDrive
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	
 	# Optional '-cc' instead of '-c' .
 	# Read/write checking of disk for bad blocks may seem unnecessary. However, these filesystems will usually be small, intended for scripts or token storage (where corruption might cause more severe data loss).
@@ -4280,6 +4308,10 @@ _zip_token() {
 	local currentZipDrive
 	currentZipDrive=$( _find_zipDrive )
 	_check_zipDrive
+	while ( ! sudo -n partprobe "$currentDrive" || ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1 )
+	do
+		sleep 1
+	done
 	
 	sudo -n mkfs.ext2 -c -b -1024 -e remount-ro -E lazy_itable_init=0,lazy_journal_init=0 -m 0 -I 256 -F "$currentZipDrive"-part1
 	
