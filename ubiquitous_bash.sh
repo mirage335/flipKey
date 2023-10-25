@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1234301915'
+export ub_setScriptChecksum_contents='4099663549'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -17674,7 +17674,7 @@ _simpleCrypt_mount_procedure() {
 		#commit=3
 		#autodefrag
 		#compress-force,compress=zlib:9
-		if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		if ! sudo -n mount -o "commit=45,discard=async,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 		then
 			currentExitStatus=1
 			return

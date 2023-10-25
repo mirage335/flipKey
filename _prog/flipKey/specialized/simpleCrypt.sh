@@ -149,7 +149,7 @@ _simpleCrypt_mount_procedure() {
 		#commit=3
 		#autodefrag
 		#compress-force,compress=zlib:9
-		if ! sudo -n mount -o "commit=45,discard,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
+		if ! sudo -n mount -o "commit=45,discard=async,compress=zstd:1,notreelog" /dev/mapper/simpleCrypt_71b362f4bea9a57dde "$flipKey_mount"
 		then
 			currentExitStatus=1
 			return
