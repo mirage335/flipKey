@@ -192,6 +192,26 @@
 
 
 
+# NOTICE Utility functions .
+
+_partprobe_check() {
+	local currentUsability
+	currentUsability=""
+	
+	local currentIteration
+	for currentIteration in $(seq 1 200)
+	do
+		! sudo -n dd if="$1" bs=1k count=1 > /dev/null 2>&1 && currentUsability=false
+		sleep 0.1
+		! sudo -n dd if="$1" bs=1k count=1 > /dev/null 2>&1 && currentUsability=false
+	done
+	
+	[[ "$currentUsability" != "false" ]] && return 0
+	return 1
+}
+
+
+
 
 
 
@@ -2099,7 +2119,7 @@ _keyPartition_disk_generic() {
 	sleep 15
 	local currentIteration
 	currentIteration=0
-	while [[ "$currentIteration" -lt 6 ]] && ( ! [[ -e "$currentDrive"-part1 ]] || ! [[ -e "$currentDrive"-part2 ]] || ! [[ -e "$currentDrive"-part3 ]] ) && ( ! [[ -e "$currentDrive"1 ]] || ! [[ -e "$currentDrive"2 ]] || ! [[ -e "$currentDrive"3 ]] ) # && ( ! [[ -e "$currentDrive"-part4 ]] || ! [[ -e "$currentDrive"4 ]] )
+	while [[ "$currentIteration" -lt 6 ]] && ( ! [[ -e "$currentDrive"-part1 ]] || ! [[ -e "$currentDrive"-part2 ]] || ! [[ -e "$currentDrive"-part3 ]] ) && ( ! [[ -e "$currentDrive"1 ]] || ! [[ -e "$currentDrive"2 ]] || ! [[ -e "$currentDrive"3 ]] || ! _partprobe_check "$currentDrive"-part1 ) # && ( ! [[ -e "$currentDrive"-part4 ]] || ! [[ -e "$currentDrive"4 ]] )
 	do
 		echo 'wait: partitions: iteration: '"$currentIteration"
 		sync
@@ -2152,7 +2172,7 @@ _keyPartition_disk_generic() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$flipKey_software_devFile"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$flipKey_software_devFile"-part1
 	do
 		sleep 1
 	done
@@ -2900,7 +2920,7 @@ _extremelyRedundant_disc() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$flipKey_software_devFile"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$flipKey_software_devFile"-part1
 	do
 		sleep 1
 	done
@@ -3574,7 +3594,7 @@ _extremelyRedundant_newPartition_automatic-mo-keyPartition-containerPartition() 
 	sleep 15
 	local currentIteration
 	currentIteration=0
-	while [[ "$currentIteration" -lt 6 ]] && ( ! [[ -e "$currentDrive"-part1 ]] || ! [[ -e "$currentDrive"-part2 ]] || ! [[ -e "$currentDrive"-part3 ]] )
+	while [[ "$currentIteration" -lt 6 ]] && ( ! [[ -e "$currentDrive"-part1 ]] || ! [[ -e "$currentDrive"-part2 ]] || ! [[ -e "$currentDrive"-part3 ]] || ! _partprobe_check "$currentDrive"-part1 )
 	do
 		echo 'wait: partitions: iteration: '"$currentIteration"
 		sync
@@ -3921,7 +3941,7 @@ _flipKey_unpackage() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentDrive"-part1
 	do
 		sleep 1
 	done
@@ -4034,7 +4054,7 @@ _mo_flipKey_unpackage() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentDrive"-part1
 	do
 		sleep 1
 	done
@@ -4064,7 +4084,7 @@ _filesystem_u() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentDrive"-part1
 	do
 		sleep 1
 	done
@@ -4103,7 +4123,7 @@ _filesystem_mo() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentDrive"-part1
 	do
 		sleep 1
 	done
@@ -4126,7 +4146,7 @@ _filesystem_mo() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentDrive"-part1
 	do
 		sleep 1
 	done
@@ -4152,7 +4172,7 @@ _filesystem_zip() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentZipDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentZipDrive"-part1
 	do
 		sleep 1
 	done
@@ -4342,7 +4362,7 @@ _zip_token() {
 	do
 		sleep 1
 	done
-	while ! sudo -n dd if="$currentZipDrive"-part1 bs=1k count=1 > /dev/null 2>&1
+	while ! _partprobe_check "$currentZipDrive"-part1
 	do
 		sleep 1
 	done
