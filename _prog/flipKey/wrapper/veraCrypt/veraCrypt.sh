@@ -530,8 +530,18 @@ _veracrypt_mount_procedure() {
 		sudo -n mkdir -p "$flipKey_mount"
 		
 		echo "$flipKey_headerKeyFile_summary" | wc -c
-		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
-		currentExitStatus="$?"
+		# WARNING: NOTICE: Kernel regression seems to have occurred between 6.1.61 and 6.5.10 , preventing veracrypt from using kernel resources to mount read-only device file.
+		# ATTRIBUTION: Bing Chat 2023-11-16 .
+		#[[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if ( [[ "$flipKey_container" == "/dev/"* ]] ) && [[ $(cat /sys/block/$(basename $(readlink -f "$flipKey_container") | tr -d '0-9' | tr -dc 'a-zA-Z')/ro) == "1" ]] && [[ $(uname -r | cut -d '.' -f 1) -gt 6 || $(uname -r | cut -d '.' -f 1) -eq 6 && $(uname -r | cut -d '.' -f 2) -gt 1 ]] && sudo -n swapoff -a
+		then
+			echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt --mount-options=nokernelcrypto -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+			currentExitStatus="$?"
+		else
+			echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+			currentExitStatus="$?"
+			[[ "$currentExitStatus" != "0" ]] && _messagePlain_request 'request: If attempting to mount read-only device file (ie. keyPartition on write protected disc), then ensure either the Linux kernel is <6.1.61 , or ensure other conditions (ie. swapoff) are met to automatically use '"'nokernelcrypto'"' veracrypt parameter .'
+		fi
 		
 		sync
 		[[ "$currentExitStatus" == "0" ]] && ! mountpoint "$flipKey_mount" > /dev/null && currentExitStatus=1

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2852207503'
+export ub_setScriptChecksum_contents='1314251858'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -17368,8 +17368,18 @@ _veracrypt_mount_procedure() {
 		sudo -n mkdir -p "$flipKey_mount"
 		
 		echo "$flipKey_headerKeyFile_summary" | wc -c
-		echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
-		currentExitStatus="$?"
+		# WARNING: NOTICE: Kernel regression seems to have occurred between 6.1.61 and 6.5.10 , preventing veracrypt from using kernel resources to mount read-only device file.
+		# ATTRIBUTION: Bing Chat 2023-11-16 .
+		#[[ "$flipKey_headerKeyFile" == "/dev/"* ]]
+		if ( [[ "$flipKey_container" == "/dev/"* ]] ) && [[ $(cat /sys/block/$(basename $(readlink -f "$flipKey_container") | tr -d '0-9' | tr -dc 'a-zA-Z')/ro) == "1" ]] && [[ $(uname -r | cut -d '.' -f 1) -gt 6 || $(uname -r | cut -d '.' -f 1) -eq 6 && $(uname -r | cut -d '.' -f 2) -gt 1 ]] && sudo -n swapoff -a
+		then
+			echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt --mount-options=nokernelcrypto -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+			currentExitStatus="$?"
+		else
+			echo "$flipKey_headerKeyFile_summary" | _messagePlain_probe_cmd veracrypt -t --hash sha512 --volume-type=normal "$flipKey_container" --stdin --keyfiles="$flipKey_headerKeyFile" "$flipKey_mount" --force --non-interactive
+			currentExitStatus="$?"
+			[[ "$currentExitStatus" != "0" ]] && _messagePlain_request 'request: If attempting to mount read-only device file (ie. keyPartition on write protected disc), then ensure either the Linux kernel is <6.1.61 , or ensure other conditions (ie. swapoff) are met to automatically use '"'nokernelcrypto'"' veracrypt parameter .'
+		fi
 		
 		sync
 		[[ "$currentExitStatus" == "0" ]] && ! mountpoint "$flipKey_mount" > /dev/null && currentExitStatus=1
