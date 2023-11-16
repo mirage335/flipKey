@@ -199,10 +199,10 @@ _partprobe_check() {
 	currentUsability=""
 	
 	local currentIteration
-	for currentIteration in $(seq 1 200)
+	for currentIteration in $(seq 1 50)
 	do
 		! sudo -n dd if="$1" bs=1k count=1 > /dev/null 2>&1 && currentUsability=false
-		sleep 0.1
+		sleep 0.5
 		! sudo -n dd if="$1" bs=1k count=1 > /dev/null 2>&1 && currentUsability=false
 	done
 	
