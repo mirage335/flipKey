@@ -50,6 +50,9 @@ _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor.bat "$scriptAbsoluteFolder"/_z__toss_fsTemp.bat
 	cp -a "$scriptAbsoluteFolder"/_anchor.bat "$scriptAbsoluteFolder"/_zz_zzCreate_fsTemp.bat
 	
+	cp -a "$scriptAbsoluteFolder"/_anchor.bat "$scriptAbsoluteFolder"/__packetTemp-enable.bat
+	cp -a "$scriptAbsoluteFolder"/_anchor.bat "$scriptAbsoluteFolder"/__packetTemp.bat
+	
 	
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor.bat  "$scriptAbsoluteFolder"/___btrfs_balance.bat

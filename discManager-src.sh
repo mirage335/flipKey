@@ -2969,6 +2969,13 @@ _extremelyRedundant_disc() {
 	_here_extremelyRedundant_disk > ./diskMount/user/flipKey/_local/disk.sh
 	sync
 	
+	# WARNING: May be untested.
+	# DANGER: NOTICE: Causes '_packetDisc_permanent' to use 'fs_temp' instead of 'fs' ! This can be DANGEROUSLY misleading !
+	cd "$functionEntryPWD"/diskMount/user/flipKey/_local
+	# WARNING: Compatibility only. Copy contents, but do NOT use directly.
+	[[ "$flipKey_headerKey_temp01_devFile" != "" ]] && [[ -e "$flipKey_headerKey_temp01_devFile" ]] && sudo -n ln -s $(echo "$flipKey_headerKey_temp01_devFile" | tr -dc 'a-zA-Z0-9-/') ./c-h-flipKey
+	[[ "$flipKey_container_temp01_devFile" != "" ]] && [[ -e "$flipKey_container_temp01_devFile" ]] && sudo -n ln -s $(echo "$flipKey_container_temp01_devFile" | tr -dc 'a-zA-Z0-9-/') ./container.vc
+	cd "$functionEntryPWD"
 	
 	
 	cd "$functionEntryPWD"/diskMount
@@ -2978,6 +2985,9 @@ _extremelyRedundant_disc() {
 	
 	sudo -n ln -s ./user/flipKey/_z__grab_fsTemp.bat
 	sudo -n ln -s ./user/flipKey/_z__toss_fsTemp.bat
+	
+	sudo -n ln -s ./user/flipKey/__packetTemp-enable.bat
+	sudo -n ln -s ./user/flipKey/__packetTemp.bat
 	
 	sudo -n ln -s ./user/flipKey/___btrfs_balance.bat
 	sudo -n ln -s ./user/flipKey/___btrfs_defrag.bat
@@ -3050,6 +3060,16 @@ export flipKey_container_mult06_devFile=$flipKey_container_mult06_devFile
 export flipKey_headerKey_mult07_devFile=$flipKey_headerKey_mult07_devFile
 export flipKey_container_mult08_devFile=$flipKey_container_mult08_devFile
 
+
+# WARNING: May be untested.
+__packetTemp-enable() {
+	[[ "$flipKey_headerKey_temp01_devFile" != "" ]] && [[ -e "$flipKey_headerKey_temp01_devFile" ]] && sudo -n ln -s $(echo "$flipKey_headerKey_temp01_devFile" | tr -dc 'a-zA-Z0-9-/') "\$scriptLocal"/c-h-flipKey
+	[[ "$flipKey_container_temp01_devFile" != "" ]] && [[ -e "$flipKey_container_temp01_devFile" ]] && sudo -n ln -s $(echo "$flipKey_container_temp01_devFile" | tr -dc 'a-zA-Z0-9-/') "\$scriptLocal"/container.vc
+}
+__packetTemp() {
+	#__packetTemp-enable "$@"
+	"$scriptAbsoluteLocation"/discManager-src.sh "$@"
+}
 
 CZXWXcRMTo8EmM8i4d
 	
