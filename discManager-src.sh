@@ -980,7 +980,7 @@ _disk_declare() {
 	ln -sf "$currentVolumeDirectory"/.gitignore "$currentVolumeDirectory"/isoSymlinks/user/flipKey/
 	
 	[[ -e "$currentVolumeDirectory"/../../fs ]] && mkdir -p "$currentVolumeDirectory"/isoSymlinks/fs
-	[[ -e "$currentVolumeDirectory"/../../fs ]] && mkdir -p "$currentVolumeDirectory"/isoSymlinks/fs_temp
+	[[ -e "$currentVolumeDirectory"/../../fs_temp ]] && mkdir -p "$currentVolumeDirectory"/isoSymlinks/fs_temp
 	[[ -e "$currentVolumeDirectory"/../fs ]] && mkdir -p "$currentVolumeDirectory"/isoSymlinks/user/fs
 	
 	
