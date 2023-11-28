@@ -1089,9 +1089,13 @@ _packetDisc_permanent_software_mkudffs() {
 	
 	mkdir -m 700 -p "$currentVolumeDirectory"/udfFiles/user/flipKey/_local
 	[[ -e "$currentVolumeDirectory"/_local/fs ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/flipKey/_local/fs
+	[[ -e "$currentVolumeDirectory"/_local/fs_temp ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/flipKey/_local/fs_temp
 	[[ -e "$currentVolumeDirectory"/fs ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/flipKey/fs
+	[[ -e "$currentVolumeDirectory"/fs_temp ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/flipKey/fs_temp
 	[[ -e "$currentVolumeDirectory"/../fs ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/fs
+	[[ -e "$currentVolumeDirectory"/../fs_temp ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/user/fs_temp
 	[[ -e "$currentVolumeDirectory"/../../fs ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/fs
+	[[ -e "$currentVolumeDirectory"/../../fs_temp ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/fs_temp
 	cp "$currentVolumeDirectory"/ops.sh "$currentVolumeDirectory"/udfFiles/user/flipKey/
 	#cp "$currentVolumeDirectory"/_local/disk.sh "$currentVolumeDirectory"/udfFiles/user/flipKey/_local/
 	cp "$currentVolumeDirectory"/_local/disk.sh "$currentVolumeDirectory"/udfFiles/user/flipKey/_local/disk.sh.orig
@@ -1110,6 +1114,7 @@ _packetDisc_permanent_software_mkudffs() {
 	
 	
 	[[ -e "$currentVolumeDirectory"/../../fs ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/fs
+	[[ -e "$currentVolumeDirectory"/../../fs_temp ]] && mkdir -p "$currentVolumeDirectory"/udfFiles/fs_temp
 	sync
 	
 	echo '
@@ -1123,6 +1128,13 @@ _disk_declare() {
 	
 	[[ -e "$scriptLocal"/../../fs ]] && export flipKey_mount="$scriptLocal"/../../fs
 	[[ -e "$scriptLocal"/../fs ]] && export flipKey_mount="$scriptLocal"/../fs
+	
+	
+	[[ -e "$scriptLocal"/fs_temp ]] && export flipKey_mount="$scriptLocal"/fs_temp
+	[[ -e "$scriptLocal"/../../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../../fs_temp
+	
+	[[ -e "$scriptLocal"/../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../fs_temp
+	[[ -e "$scriptLocal"/../fs_temp ]] && export flipKey_mount="$scriptLocal"/../fs_temp
 	
 	
 	export flipKey_headerKeySize='$(cat "$currentVolumeDirectory"/_local/c-h-flipKey | wc -c | tr -dc '0-9')'
