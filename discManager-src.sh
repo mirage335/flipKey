@@ -871,6 +871,7 @@ _disk_declare() {
 		rm -f "$currentVolumeDirectory"/isoSymlinks/user/flipKey/_local/c-h-flipKey.bak
 		#rm -f "$currentVolumeDirectory"/isoSymlinks/user/flipKey/_local
 		rmdir "$currentVolumeDirectory"/isoSymlinks/user/flipKey/_local/fs
+		rmdir "$currentVolumeDirectory"/isoSymlinks/user/flipKey/_local/fs_temp
 		rmdir "$currentVolumeDirectory"/isoSymlinks/user/flipKey/_local
 		rmdir "$currentVolumeDirectory"/isoSymlinks/user/flipKey
 		rmdir "$currentVolumeDirectory"/isoSymlinks/user
@@ -952,6 +953,13 @@ _disk_declare() {
 	
 	[[ -e "$scriptLocal"/../../fs ]] && export flipKey_mount="$scriptLocal"/../../fs
 	[[ -e "$scriptLocal"/../fs ]] && export flipKey_mount="$scriptLocal"/../fs
+	
+	
+	[[ -e "$scriptLocal"/fs_temp ]] && export flipKey_mount="$scriptLocal"/fs_temp
+	[[ -e "$scriptLocal"/../../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../../fs_temp
+	
+	[[ -e "$scriptLocal"/../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../fs_temp
+	[[ -e "$scriptLocal"/../fs_temp ]] && export flipKey_mount="$scriptLocal"/../fs_temp
 	
 	
 	export flipKey_headerKeySize='$(cat "$currentVolumeDirectory"/_local/c-h-flipKey | wc -c | tr -dc '0-9')'
