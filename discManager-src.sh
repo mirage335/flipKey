@@ -2168,11 +2168,12 @@ _keyPartition_disk_generic() {
 	
 	
 	# ATTENTION: Software .
-	while ! sudo -n partprobe "$flipKey_software_devFile"
+	#while ! sudo -n partprobe "$flipKey_software_devFile"
+	while ! sudo -n partprobe "$currentDrive"
 	do
 		sleep 1
 	done
-	while ! _partprobe_check "$flipKey_software_devFile"-part1
+	while ! _partprobe_check "$flipKey_software_devFile"
 	do
 		sleep 1
 	done
@@ -2621,14 +2622,25 @@ _mo640_extremelyRedundant() {
 	currentDrive=$( _find_moDrive )
 	_check_moDrive
 	
-	_extremelyRedundant_desilver_partitions "$currentDrive"
-	_extremelyRedundant_desilver_partitionTable "$currentDrive"
+	[[ "$devfast" != "true" ]] && _extremelyRedundant_desilver_partitions "$currentDrive"
+	[[ "$devfast" != "true" ]] && _extremelyRedundant_desilver_partitionTable "$currentDrive"
 	echo
 	
-	_desilver_mo
+	[[ "$devfast" != "true" ]] && _desilver_mo
+	[[ "$devfast" == "true" ]] && _pattern_recovery_write "$currentDrive"
+	
+	if [[ "$devfast" == "true" ]]
+	then
+		sudo -n partprobe "$currentDrive"
+		sync
+	fi
+	
 	echo
 	
 	_extremelyRedundant_disc "$currentDrive" "_disc_mo640_extremelyRedundant"
+	
+	sudo -n partprobe "$currentDrive"
+	sync
 }
 _extremelyRedundant_disc() {
 	! _extremelyRedundant_criticalDep && exit 1
@@ -2916,11 +2928,12 @@ _extremelyRedundant_disc() {
 	
 	
 	# ATTENTION: Software .
-	while ! sudo -n partprobe "$flipKey_software_devFile"
+	#while ! sudo -n partprobe "$flipKey_software_devFile"
+	while ! sudo -n partprobe "$currentDrive"
 	do
 		sleep 1
 	done
-	while ! _partprobe_check "$flipKey_software_devFile"-part1
+	while ! _partprobe_check "$flipKey_software_devFile"
 	do
 		sleep 1
 	done
