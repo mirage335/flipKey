@@ -3000,7 +3000,7 @@ _extremelyRedundant_disc() {
 	sudo -n ln -s ./user/flipKey/_z__toss_fsTemp.bat
 	
 	sudo -n ln -s ./user/flipKey/__packetTemp-enable.bat
-	sudo -n ln -s ./user/flipKey/__packetTemp.bat
+	#sudo -n ln -s ./user/flipKey/__packetTemp.bat
 	
 	sudo -n ln -s ./user/flipKey/___btrfs_balance.bat
 	sudo -n ln -s ./user/flipKey/___btrfs_defrag.bat
@@ -3080,8 +3080,8 @@ __packetTemp-enable() {
 	[[ "$flipKey_container_temp01_devFile" != "" ]] && [[ -e "$flipKey_container_temp01_devFile" ]] && sudo -n ln -s $(echo "$flipKey_container_temp01_devFile" | tr -dc 'a-zA-Z0-9-/') "\$scriptLocal"/container.vc
 }
 __packetTemp() {
-	#__packetTemp-enable "$@"
-	"$scriptAbsoluteLocation"/discManager-src.sh "$@"
+	#__packetTemp-enable "\$@"
+	"\$scriptAbsoluteFolder"/discManager-src.sh _packetDisc_permanent "\$@"
 }
 
 CZXWXcRMTo8EmM8i4d
