@@ -845,6 +845,13 @@ _disk_declare() {
 	[[ -e "$scriptLocal"/../fs ]] && export flipKey_mount="$scriptLocal"/../fs
 	
 	
+	[[ -e "$scriptLocal"/fs_temp ]] && export flipKey_mount="$scriptLocal"/fs_temp
+	[[ -e "$scriptLocal"/../../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../../fs_temp
+	
+	[[ -e "$scriptLocal"/../../fs_temp ]] && export flipKey_mount="$scriptLocal"/../../fs_temp
+	[[ -e "$scriptLocal"/../fs_temp ]] && export flipKey_mount="$scriptLocal"/../fs_temp
+	
+	
 	export flipKey_headerKeySize='$(cat "$currentVolumeDirectory"/_local/c-h-flipKey | wc -c | tr -dc '0-9')'
 	
 	
